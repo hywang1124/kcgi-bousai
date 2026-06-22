@@ -9,3 +9,9 @@
 # 基于编辑器的 HTTP 客户端请求
 /httpRequests/
 .idea
+
+# 作業ディレクトリ次第でルートにも生成され得る SQLite / 機密
+data/
+*.db
+*.db-journal
+.env
