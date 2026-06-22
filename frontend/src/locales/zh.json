@@ -1,0 +1,22 @@
+{
+  "app": {
+    "title": "防灾地图",
+    "subtitle": "不让任何人掉队的多语言防灾信息"
+  },
+  "language": {
+    "label": "语言",
+    "ja": "日本語",
+    "en": "English",
+    "zh": "中文"
+  },
+  "shelters": {
+    "heading": "避难所一览",
+    "loading": "加载中…",
+    "error": "获取避难所失败",
+    "empty": "暂无避难所",
+    "address": "地址",
+    "capacity": "容纳人数",
+    "people": "人",
+    "facilities": "设施"
+  }
+}

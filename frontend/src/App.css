@@ -1,0 +1,68 @@
+.app {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  text-align: left;
+}
+
+.app-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid #8884;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.subtitle {
+  margin: 0.25rem 0 0;
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+.language-switcher {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.language-switcher button {
+  padding: 0.25rem 0.6rem;
+  cursor: pointer;
+}
+
+.language-switcher button:disabled {
+  cursor: default;
+  font-weight: 700;
+}
+
+.shelter-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.shelter-card {
+  border: 1px solid #8884;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.shelter-card h3 {
+  margin: 0 0 0.5rem;
+}
+
+.shelter-card p {
+  margin: 0.2rem 0;
+  font-size: 0.9rem;
+}

@@ -1,0 +1,22 @@
+{
+  "app": {
+    "title": "Bousai Map",
+    "subtitle": "Multilingual disaster-prevention info, leaving no one behind"
+  },
+  "language": {
+    "label": "Language",
+    "ja": "日本語",
+    "en": "English",
+    "zh": "中文"
+  },
+  "shelters": {
+    "heading": "Evacuation Shelters",
+    "loading": "Loading…",
+    "error": "Failed to load shelters",
+    "empty": "No shelters registered",
+    "address": "Address",
+    "capacity": "Capacity",
+    "people": "people",
+    "facilities": "Facilities"
+  }
+}
