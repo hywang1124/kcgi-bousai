@@ -32,6 +32,15 @@
     "error": "发送失败",
     "sources": "来源"
   },
+  "register": {
+    "title": "创建账号",
+    "submit": "注册",
+    "toLogin": "返回登录",
+    "toRegister": "创建账号",
+    "success": "注册成功，请登录。",
+    "duplicate": "该用户名已被占用",
+    "error": "注册失败"
+  },
   "admin": {
     "loginHeading": "管理员登录",
     "username": "用户名",
@@ -41,7 +50,29 @@
     "loginError": "登录失败",
     "invalidCredentials": "用户名或密码不正确",
     "heading": "管理后台",
+    "console": "管理控制台",
     "loggedInAs": "已登录",
-    "logout": "登出"
+    "logout": "登出",
+    "noAccess": "没有管理员权限",
+    "tabShelters": "避难所管理",
+    "tabUsers": "用户管理",
+    "shelterAdmin": {
+      "create": "新建避难所",
+      "edit": "编辑",
+      "save": "保存",
+      "cancel": "取消",
+      "delete": "删除",
+      "nameJa": "名称（日文）",
+      "nameEn": "名称（英文）",
+      "nameZh": "名称（中文）",
+      "lat": "纬度",
+      "lng": "经度",
+      "facilitiesHint": "设施（逗号分隔）"
+    },
+    "userAdmin": {
+      "title": "用户列表",
+      "username": "用户名",
+      "role": "角色"
+    }
   }
 }

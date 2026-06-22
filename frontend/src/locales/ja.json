@@ -32,6 +32,15 @@
     "error": "送信に失敗しました",
     "sources": "参照元"
   },
+  "register": {
+    "title": "アカウント作成",
+    "submit": "登録",
+    "toLogin": "ログインへ",
+    "toRegister": "アカウント作成",
+    "success": "登録しました。ログインしてください。",
+    "duplicate": "このユーザー名は既に使用されています",
+    "error": "登録に失敗しました"
+  },
   "admin": {
     "loginHeading": "管理者ログイン",
     "username": "ユーザー名",
@@ -41,7 +50,29 @@
     "loginError": "ログインに失敗しました",
     "invalidCredentials": "ユーザー名またはパスワードが正しくありません",
     "heading": "管理ダッシュボード",
+    "console": "管理コンソール",
     "loggedInAs": "ログイン中",
-    "logout": "ログアウト"
+    "logout": "ログアウト",
+    "noAccess": "管理者権限がありません",
+    "tabShelters": "避難所管理",
+    "tabUsers": "ユーザ管理",
+    "shelterAdmin": {
+      "create": "避難所を新規作成",
+      "edit": "編集",
+      "save": "保存",
+      "cancel": "キャンセル",
+      "delete": "削除",
+      "nameJa": "名称（日本語）",
+      "nameEn": "名称（英語）",
+      "nameZh": "名称（中国語）",
+      "lat": "緯度",
+      "lng": "経度",
+      "facilitiesHint": "設備（カンマ区切り）"
+    },
+    "userAdmin": {
+      "title": "ユーザ一覧",
+      "username": "ユーザー名",
+      "role": "役割"
+    }
   }
 }

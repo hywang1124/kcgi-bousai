@@ -1,3 +1,14 @@
+/** ユーザ役割 */
+export type Role = 'ADMIN' | 'EDITOR' | 'USER'
+
+/** 管理対象ユーザ（/api/v1/admin/users） */
+export interface UserAccount {
+  id: number
+  username: string
+  role: Role
+  enabled: boolean
+}
+
 /** ログイン成功時のレスポンス */
 export interface LoginResponse {
   token: string

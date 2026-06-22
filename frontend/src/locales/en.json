@@ -32,6 +32,15 @@
     "error": "Failed to send",
     "sources": "Sources"
   },
+  "register": {
+    "title": "Create account",
+    "submit": "Register",
+    "toLogin": "Back to login",
+    "toRegister": "Create account",
+    "success": "Registered. Please log in.",
+    "duplicate": "This username is already taken",
+    "error": "Registration failed"
+  },
   "admin": {
     "loginHeading": "Admin Login",
     "username": "Username",
@@ -41,7 +50,29 @@
     "loginError": "Login failed",
     "invalidCredentials": "Incorrect username or password",
     "heading": "Admin Dashboard",
+    "console": "Admin Console",
     "loggedInAs": "Logged in as",
-    "logout": "Log out"
+    "logout": "Log out",
+    "noAccess": "You do not have admin access",
+    "tabShelters": "Shelters",
+    "tabUsers": "Users",
+    "shelterAdmin": {
+      "create": "Create shelter",
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "nameJa": "Name (Japanese)",
+      "nameEn": "Name (English)",
+      "nameZh": "Name (Chinese)",
+      "lat": "Latitude",
+      "lng": "Longitude",
+      "facilitiesHint": "Facilities (comma-separated)"
+    },
+    "userAdmin": {
+      "title": "Users",
+      "username": "Username",
+      "role": "Role"
+    }
   }
 }
