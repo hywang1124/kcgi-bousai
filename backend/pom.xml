@@ -58,6 +58,17 @@
 			<artifactId>spring-boot-starter-webmvc</artifactId>
 		</dependency>
 
+		<!-- 管理後台の認証: Spring Security + 自前発行 JWT(対称鍵 HS256)。
+		     oauth2-resource-server が JwtEncoder/JwtDecoder(Nimbus/jose)を提供 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
+		</dependency>
+
 		<!-- SQLite (dev): JDBC ドライバ + Hibernate コミュニティ方言。Boot BOM 管理外のため版本を明示 -->
 		<dependency>
 			<groupId>org.xerial</groupId>

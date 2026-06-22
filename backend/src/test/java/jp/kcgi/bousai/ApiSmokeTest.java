@@ -66,4 +66,61 @@ class ApiSmokeTest {
 
         assertEquals(400, res.statusCode());
     }
+
+    @Test
+    void adminEndpointRequiresAuthentication() throws Exception {
+        HttpResponse<String> res = http.send(
+                HttpRequest.newBuilder(URI.create(url("/api/v1/admin/me"))).GET().build(),
+                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+
+        assertEquals(401, res.statusCode());
+    }
+
+    @Test
+    void loginIssuesTokenAndGrantsAdminAccess() throws Exception {
+        String loginBody = "{\"username\":\"admin\",\"password\":\"admin12345\"}";
+        HttpResponse<String> login = http.send(
+                HttpRequest.newBuilder(URI.create(url("/api/v1/auth/login")))
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(loginBody, StandardCharsets.UTF_8))
+                        .build(),
+                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        assertEquals(200, login.statusCode());
+
+        String token = extractJsonString(login.body(), "token");
+        assertTrue(token != null && !token.isBlank(), "login should return a token");
+
+        HttpResponse<String> me = http.send(
+                HttpRequest.newBuilder(URI.create(url("/api/v1/admin/me")))
+                        .header("Authorization", "Bearer " + token)
+                        .GET().build(),
+                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        assertEquals(200, me.statusCode());
+        assertTrue(me.body().contains("ADMIN"), "admin should have the ADMIN role");
+    }
+
+    @Test
+    void loginRejectsWrongPassword() throws Exception {
+        String body = "{\"username\":\"admin\",\"password\":\"nope\"}";
+        HttpResponse<String> res = http.send(
+                HttpRequest.newBuilder(URI.create(url("/api/v1/auth/login")))
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
+                        .build(),
+                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+
+        assertEquals(401, res.statusCode());
+    }
+
+    /** テスト用の簡易 JSON 文字列フィールド抽出。 */
+    private static String extractJsonString(String json, String field) {
+        String key = "\"" + field + "\":\"";
+        int start = json.indexOf(key);
+        if (start < 0) {
+            return null;
+        }
+        start += key.length();
+        int end = json.indexOf('"', start);
+        return end < 0 ? null : json.substring(start, end);
+    }
 }
