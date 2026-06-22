@@ -56,6 +56,31 @@ public class Shelter extends Auditable {
         // JPA 用
     }
 
+    public Shelter(String nameJa, String nameEn, String nameZh, String address,
+                   Double lat, Double lng, Integer capacity, String facilities) {
+        this.nameJa = nameJa;
+        this.nameEn = nameEn;
+        this.nameZh = nameZh;
+        this.address = address;
+        this.lat = lat;
+        this.lng = lng;
+        this.capacity = capacity;
+        this.facilities = facilities;
+    }
+
+    /** 編集可能な項目を一括更新する。 */
+    public void update(String nameJa, String nameEn, String nameZh, String address,
+                       Double lat, Double lng, Integer capacity, String facilities) {
+        this.nameJa = nameJa;
+        this.nameEn = nameEn;
+        this.nameZh = nameZh;
+        this.address = address;
+        this.lat = lat;
+        this.lng = lng;
+        this.capacity = capacity;
+        this.facilities = facilities;
+    }
+
     public Long getId() {
         return id;
     }

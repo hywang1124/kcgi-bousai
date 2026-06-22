@@ -112,6 +112,109 @@ class ApiSmokeTest {
         assertEquals(401, res.statusCode());
     }
 
+    @Test
+    void registerCreatesUserWithUserRole() throws Exception {
+        String username = "user" + System.nanoTime();
+        String body = "{\"username\":\"" + username + "\",\"password\":\"password123\"}";
+        HttpResponse<String> res = http.send(
+                HttpRequest.newBuilder(URI.create(url("/api/v1/auth/register")))
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
+                        .build(),
+                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+
+        assertEquals(201, res.statusCode());
+        assertTrue(res.body().contains("\"role\":\"USER\""), "new user should default to USER role");
+    }
+
+    @Test
+    void shelterWriteRequiresAuthentication() throws Exception {
+        String body = "{\"nameJa\":\"テスト\",\"lat\":35.0,\"lng\":135.0}";
+        HttpResponse<String> res = http.send(
+                HttpRequest.newBuilder(URI.create(url("/api/v1/shelters")))
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
+                        .build(),
+                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+
+        assertEquals(401, res.statusCode());
+    }
+
+    @Test
+    void adminCanCreateAndDeleteShelter() throws Exception {
+        String token = adminToken();
+        String body = "{\"nameJa\":\"テスト避難所\",\"lat\":35.01,\"lng\":135.76,\"capacity\":100,\"facilities\":[\"水\",\"毛布\"]}";
+        HttpResponse<String> created = http.send(
+                HttpRequest.newBuilder(URI.create(url("/api/v1/shelters")))
+                        .header("Content-Type", "application/json")
+                        .header("Authorization", "Bearer " + token)
+                        .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
+                        .build(),
+                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        assertEquals(201, created.statusCode());
+
+        long id = extractJsonNumber(created.body(), "id");
+        assertTrue(id > 0, "created shelter should have an id");
+
+        HttpResponse<String> deleted = http.send(
+                HttpRequest.newBuilder(URI.create(url("/api/v1/shelters/" + id)))
+                        .header("Authorization", "Bearer " + token)
+                        .DELETE().build(),
+                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        assertEquals(204, deleted.statusCode());
+    }
+
+    @Test
+    void adminCanChangeUserRole() throws Exception {
+        String username = "role" + System.nanoTime();
+        String reg = "{\"username\":\"" + username + "\",\"password\":\"password123\"}";
+        HttpResponse<String> registered = http.send(
+                HttpRequest.newBuilder(URI.create(url("/api/v1/auth/register")))
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(reg, StandardCharsets.UTF_8))
+                        .build(),
+                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        long id = extractJsonNumber(registered.body(), "id");
+
+        String token = adminToken();
+        HttpResponse<String> updated = http.send(
+                HttpRequest.newBuilder(URI.create(url("/api/v1/admin/users/" + id + "/role")))
+                        .header("Content-Type", "application/json")
+                        .header("Authorization", "Bearer " + token)
+                        .PUT(HttpRequest.BodyPublishers.ofString("{\"role\":\"EDITOR\"}", StandardCharsets.UTF_8))
+                        .build(),
+                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+
+        assertEquals(200, updated.statusCode());
+        assertTrue(updated.body().contains("\"role\":\"EDITOR\""), "role should be updated to EDITOR");
+    }
+
+    private String adminToken() throws Exception {
+        HttpResponse<String> login = http.send(
+                HttpRequest.newBuilder(URI.create(url("/api/v1/auth/login")))
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(
+                                "{\"username\":\"admin\",\"password\":\"admin12345\"}", StandardCharsets.UTF_8))
+                        .build(),
+                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        return extractJsonString(login.body(), "token");
+    }
+
+    /** テスト用の簡易 JSON 数値フィールド抽出。 */
+    private static long extractJsonNumber(String json, String field) {
+        String key = "\"" + field + "\":";
+        int start = json.indexOf(key);
+        if (start < 0) {
+            return -1;
+        }
+        start += key.length();
+        int end = start;
+        while (end < json.length() && (Character.isDigit(json.charAt(end)) || json.charAt(end) == '-')) {
+            end++;
+        }
+        return end > start ? Long.parseLong(json.substring(start, end)) : -1;
+    }
+
     /** テスト用の簡易 JSON 文字列フィールド抽出。 */
     private static String extractJsonString(String json, String field) {
         String key = "\"" + field + "\":\"";

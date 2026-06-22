@@ -50,13 +50,21 @@ npm run dev
 | --- | --- | --- |
 | GET | `/api/v1/shelters` | 避難所一覧（公開） |
 | POST | `/api/v1/chat` | 防災 AI 問答（公開・現在はモック実装。`{"question","lang"}`） |
+| POST | `/api/v1/auth/register` | セルフ登録（公開・既定ロール USER。`{"username","password"}`） |
 | POST | `/api/v1/auth/login` | ログインして JWT を取得（`{"username","password"}`） |
+| POST | `/api/v1/shelters` | 避難所を作成（**ADMIN**） |
+| PUT | `/api/v1/shelters/{id}` | 避難所を更新（**ADMIN**） |
+| DELETE | `/api/v1/shelters/{id}` | 避難所を削除（**ADMIN**） |
+| GET | `/api/v1/admin/users` | ユーザ一覧（**ADMIN**） |
+| PUT | `/api/v1/admin/users/{id}/role` | 役割変更（**ADMIN**・`{"role":"ADMIN|EDITOR|USER"}`） |
 | GET | `/api/v1/admin/me` | 認証中の管理者情報（要 ADMIN・`Authorization: Bearer <token>`） |
 | GET | `/actuator/health` | ヘルスチェック（公開） |
 
-### 認証（管理後台）
+### 認証 / 認可（管理後台）
 
-- ステートレス JWT（HS256）。`/api/v1/admin/**` は ADMIN ロール必須。
+- ステートレス JWT（HS256）。役割は **ADMIN / EDITOR / USER** の 3 種。
+- 公開: 避難所一覧（GET）・AI 問答・登録・ログイン・ヘルス。
+- **ADMIN 限定**: 避難所の作成/更新/削除、`/api/v1/admin/**`（ユーザ・役割管理）。
 - **dev** 管理者: `admin` / `admin12345`（初回起動時に自動作成）。
 - **本番** は秘密鍵を環境変数 `JWT_SECRET`（32 バイト以上）で必ず指定する。
 

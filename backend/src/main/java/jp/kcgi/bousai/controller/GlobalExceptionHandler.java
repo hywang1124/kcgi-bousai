@@ -10,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.stream.Collectors;
 
@@ -62,6 +63,14 @@ public class GlobalExceptionHandler {
 
     private String formatFieldError(FieldError error) {
         return error.getField() + ": " + error.getDefaultMessage();
+    }
+
+    /** 明示的な HTTP ステータス付き例外（409 重複・404 未検出など） → そのステータスで返す */
+    @ExceptionHandler(ResponseStatusException.class)
+    public ProblemDetail handleResponseStatus(ResponseStatusException ex) {
+        ProblemDetail problem = ProblemDetail.forStatus(ex.getStatusCode());
+        problem.setDetail(ex.getReason());
+        return problem;
     }
 
     /** 想定外の例外 → 500 Internal Server Error（詳細はログのみ、レスポンスには出さない） */

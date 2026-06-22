@@ -62,6 +62,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/shelters/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/chat").permitAll()
+                        // 避難所の作成・更新・削除は ADMIN 限定（GET は上で公開済み）
+                        .requestMatchers("/api/v1/shelters/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2

@@ -2,6 +2,8 @@ package jp.kcgi.bousai.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,9 +28,10 @@ public class User extends Auditable {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    /** 役割（例: ADMIN）。権限は ROLE_<role> として扱う */
+    /** 役割。権限は ROLE_<role> として扱う */
+    @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    private String role;
+    private Role role;
 
     /** 有効フラグ */
     @Column(name = "enabled", nullable = false)
@@ -38,7 +41,7 @@ public class User extends Auditable {
         // JPA 用
     }
 
-    public User(String username, String passwordHash, String role, boolean enabled) {
+    public User(String username, String passwordHash, Role role, boolean enabled) {
         this.username = username;
         this.passwordHash = passwordHash;
         this.role = role;
@@ -57,8 +60,13 @@ public class User extends Auditable {
         return passwordHash;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
+    }
+
+    /** 役割を変更する（角色管理用）。 */
+    public void changeRole(Role role) {
+        this.role = role;
     }
 
     public boolean isEnabled() {

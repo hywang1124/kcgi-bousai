@@ -1,5 +1,6 @@
 package jp.kcgi.bousai.config;
 
+import jp.kcgi.bousai.domain.Role;
 import jp.kcgi.bousai.domain.User;
 import jp.kcgi.bousai.repository.UserRepository;
 import org.slf4j.Logger;
@@ -42,7 +43,7 @@ public class DevAdminInitializer implements CommandLineRunner {
         if (userRepository.existsByUsername(username)) {
             return;
         }
-        userRepository.save(new User(username, passwordEncoder.encode(password), "ADMIN", true));
+        userRepository.save(new User(username, passwordEncoder.encode(password), Role.ADMIN, true));
         log.info("dev 管理者ユーザを作成しました: {} （パスワードは app.admin.default-password）", username);
     }
 }
