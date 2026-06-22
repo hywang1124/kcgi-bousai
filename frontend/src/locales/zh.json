@@ -11,7 +11,8 @@
   },
   "nav": {
     "shelters": "避难所",
-    "chat": "AI 问答"
+    "chat": "AI 问答",
+    "admin": "管理"
   },
   "shelters": {
     "heading": "避难所一览",
@@ -30,5 +31,17 @@
     "sending": "发送中…",
     "error": "发送失败",
     "sources": "来源"
+  },
+  "admin": {
+    "loginHeading": "管理员登录",
+    "username": "用户名",
+    "password": "密码",
+    "login": "登录",
+    "loggingIn": "登录中…",
+    "loginError": "登录失败",
+    "invalidCredentials": "用户名或密码不正确",
+    "heading": "管理后台",
+    "loggedInAs": "已登录",
+    "logout": "登出"
   }
 }

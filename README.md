@@ -48,9 +48,17 @@ npm run dev
 
 | メソッド | パス | 説明 |
 | --- | --- | --- |
-| GET | `/api/v1/shelters` | 避難所一覧 |
-| POST | `/api/v1/chat` | 防災 AI 問答（現在はモック実装。`{"question","lang"}`） |
-| GET | `/actuator/health` | ヘルスチェック |
+| GET | `/api/v1/shelters` | 避難所一覧（公開） |
+| POST | `/api/v1/chat` | 防災 AI 問答（公開・現在はモック実装。`{"question","lang"}`） |
+| POST | `/api/v1/auth/login` | ログインして JWT を取得（`{"username","password"}`） |
+| GET | `/api/v1/admin/me` | 認証中の管理者情報（要 ADMIN・`Authorization: Bearer <token>`） |
+| GET | `/actuator/health` | ヘルスチェック（公開） |
+
+### 認証（管理後台）
+
+- ステートレス JWT（HS256）。`/api/v1/admin/**` は ADMIN ロール必須。
+- **dev** 管理者: `admin` / `admin12345`（初回起動時に自動作成）。
+- **本番** は秘密鍵を環境変数 `JWT_SECRET`（32 バイト以上）で必ず指定する。
 
 ## テスト / ビルド
 

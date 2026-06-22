@@ -11,7 +11,8 @@
   },
   "nav": {
     "shelters": "Shelters",
-    "chat": "Ask AI"
+    "chat": "Ask AI",
+    "admin": "Admin"
   },
   "shelters": {
     "heading": "Evacuation Shelters",
@@ -30,5 +31,17 @@
     "sending": "Sending…",
     "error": "Failed to send",
     "sources": "Sources"
+  },
+  "admin": {
+    "loginHeading": "Admin Login",
+    "username": "Username",
+    "password": "Password",
+    "login": "Log in",
+    "loggingIn": "Logging in…",
+    "loginError": "Login failed",
+    "invalidCredentials": "Incorrect username or password",
+    "heading": "Admin Dashboard",
+    "loggedInAs": "Logged in as",
+    "logout": "Log out"
   }
 }

@@ -11,7 +11,8 @@
   },
   "nav": {
     "shelters": "避難所",
-    "chat": "AI相談"
+    "chat": "AI相談",
+    "admin": "管理"
   },
   "shelters": {
     "heading": "避難所一覧",
@@ -30,5 +31,17 @@
     "sending": "送信中…",
     "error": "送信に失敗しました",
     "sources": "参照元"
+  },
+  "admin": {
+    "loginHeading": "管理者ログイン",
+    "username": "ユーザー名",
+    "password": "パスワード",
+    "login": "ログイン",
+    "loggingIn": "ログイン中…",
+    "loginError": "ログインに失敗しました",
+    "invalidCredentials": "ユーザー名またはパスワードが正しくありません",
+    "heading": "管理ダッシュボード",
+    "loggedInAs": "ログイン中",
+    "logout": "ログアウト"
   }
 }

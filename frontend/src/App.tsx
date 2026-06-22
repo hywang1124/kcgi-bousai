@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from './components/LanguageSwitcher'
 import { SheltersPage } from './pages/SheltersPage'
 import { ChatPage } from './pages/ChatPage'
+import { AdminPage } from './pages/AdminPage'
 import './App.css'
 
-type View = 'shelters' | 'chat'
+type View = 'shelters' | 'chat' | 'admin'
 
 function App() {
   const { t } = useTranslation()
@@ -36,9 +37,20 @@ function App() {
         >
           {t('nav.chat')}
         </button>
+        <button
+          type="button"
+          onClick={() => setView('admin')}
+          disabled={view === 'admin'}
+        >
+          {t('nav.admin')}
+        </button>
       </nav>
 
-      <main>{view === 'shelters' ? <SheltersPage /> : <ChatPage />}</main>
+      <main>
+        {view === 'shelters' && <SheltersPage />}
+        {view === 'chat' && <ChatPage />}
+        {view === 'admin' && <AdminPage />}
+      </main>
     </div>
   )
 }
