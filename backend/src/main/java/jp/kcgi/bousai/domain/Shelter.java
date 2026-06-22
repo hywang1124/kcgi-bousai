@@ -7,17 +7,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-import java.time.Instant;
-
 /**
  * 避難所エンティティ。{@code shelters} テーブルに対応する。
  *
- * <p>スキーマは Flyway 管理（V1__init.sql）。本クラスは読み取り中心のため、
- * {@code createdAt} は DB 側の DEFAULT に委ね、挿入・更新対象から外している。</p>
+ * <p>スキーマは Flyway 管理（V1__init.sql）。監査フィールドは {@link Auditable} を参照。</p>
  */
 @Entity
 @Table(name = "shelters")
-public class Shelter {
+public class Shelter extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,10 +51,6 @@ public class Shelter {
     /** 設備（カンマ区切りの文字列） */
     @Column(name = "facilities")
     private String facilities;
-
-    /** 作成日時（DB の DEFAULT CURRENT_TIMESTAMP に委ねる） */
-    @Column(name = "created_at", insertable = false, updatable = false)
-    private Instant createdAt;
 
     protected Shelter() {
         // JPA 用
@@ -97,9 +90,5 @@ public class Shelter {
 
     public String getFacilities() {
         return facilities;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
     }
 }

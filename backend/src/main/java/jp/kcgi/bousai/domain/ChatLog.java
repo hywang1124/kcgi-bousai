@@ -7,15 +7,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-import java.time.Instant;
-
 /**
  * AI 問答ログ。{@code chat_logs} テーブルに対応する。
  * 後からの検証・改善のため、質問・回答・言語・参照元を記録する。
+ * 監査フィールド（作成/更新の日時・者）は {@link Auditable} を参照。
  */
 @Entity
 @Table(name = "chat_logs")
-public class ChatLog {
+public class ChatLog extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,10 +35,6 @@ public class ChatLog {
     /** 参照元（カンマ区切り。RAG 導入後は検索ヒット文書のタイトル等） */
     @Column(name = "sources")
     private String sources;
-
-    /** 作成日時（DB の DEFAULT に委ねる） */
-    @Column(name = "created_at", insertable = false, updatable = false)
-    private Instant createdAt;
 
     protected ChatLog() {
         // JPA 用
@@ -70,9 +65,5 @@ public class ChatLog {
 
     public String getSources() {
         return sources;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
     }
 }

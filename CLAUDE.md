@@ -175,6 +175,7 @@ bousai-map/
 - 统一异常处理用 `@RestControllerAdvice`；REST 用规范 HTTP 状态码。
 - 构造器注入（配 `final` 字段），**不用**字段注入 `@Autowired`。
 - 注释 / Javadoc 用**日语**（与课题语言一致，方便老师评审与队内协作）。
+- **审计字段（强制）**：所有 Entity **必须继承 `domain/Auditable`**，统一拥有 `created_at` / `created_by` / `last_modified_at` / `last_modified_by`（对应 `@CreatedDate` / `@CreatedBy` / `@LastModifiedDate` / `@LastModifiedBy`）。这 4 个字段由 **Spring Data JPA Auditing**（`@EnableJpaAuditing` + `AuditingEntityListener` + `AuditorAware`）在持久化（INSERT/UPDATE）时**自动填充**——**禁止**手动赋值、也**不要**为此另写 AOP 切面。`createdBy`/`lastModifiedBy` 取当前登录用户名，未认证（公开 API / 启动种子）时为 `system`。**新建表必须包含这 4 列**（Flyway 迁移里加，双库同步）。
 
 **API**
 - 路径 `/api/v1/...`，资源名复数：`/api/v1/shelters`、`/api/v1/chat`。

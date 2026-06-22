@@ -7,14 +7,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-import java.time.Instant;
-
 /**
- * 管理者ユーザ。{@code users} テーブルに対応する。
+ * 管理者ユーザ。{@code users} テーブルに対応する。監査フィールドは {@link Auditable} を参照。
  */
 @Entity
 @Table(name = "users")
-public class User {
+public class User extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,10 +33,6 @@ public class User {
     /** 有効フラグ */
     @Column(name = "enabled", nullable = false)
     private boolean enabled;
-
-    /** 作成日時（DB の DEFAULT に委ねる） */
-    @Column(name = "created_at", insertable = false, updatable = false)
-    private Instant createdAt;
 
     protected User() {
         // JPA 用
@@ -69,9 +63,5 @@ public class User {
 
     public boolean isEnabled() {
         return enabled;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
     }
 }
