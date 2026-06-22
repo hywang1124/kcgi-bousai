@@ -9,6 +9,10 @@
     "en": "English",
     "zh": "中文"
   },
+  "nav": {
+    "shelters": "避难所",
+    "chat": "AI 问答"
+  },
   "shelters": {
     "heading": "避难所一览",
     "loading": "加载中…",
@@ -18,5 +22,13 @@
     "capacity": "容纳人数",
     "people": "人",
     "facilities": "设施"
+  },
+  "chat": {
+    "heading": "向防灾 AI 提问",
+    "placeholder": "例如：地震时该怎么办？",
+    "send": "提问",
+    "sending": "发送中…",
+    "error": "发送失败",
+    "sources": "来源"
   }
 }

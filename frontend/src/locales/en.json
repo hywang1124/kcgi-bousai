@@ -9,6 +9,10 @@
     "en": "English",
     "zh": "中文"
   },
+  "nav": {
+    "shelters": "Shelters",
+    "chat": "Ask AI"
+  },
   "shelters": {
     "heading": "Evacuation Shelters",
     "loading": "Loading…",
@@ -18,5 +22,13 @@
     "capacity": "Capacity",
     "people": "people",
     "facilities": "Facilities"
+  },
+  "chat": {
+    "heading": "Ask the Disaster-Prevention AI",
+    "placeholder": "e.g. What should I do when an earthquake hits?",
+    "send": "Ask",
+    "sending": "Sending…",
+    "error": "Failed to send",
+    "sources": "Sources"
   }
 }
