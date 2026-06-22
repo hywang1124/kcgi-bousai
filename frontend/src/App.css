@@ -117,6 +117,33 @@
   cursor: pointer;
 }
 
+.map-container {
+  height: 70vh;
+  min-height: 360px;
+  width: 100%;
+  border: 1px solid #8884;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.map-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  margin: 0 0 0.6rem;
+}
+
+.legend-shelter {
+  color: #1565c0;
+  margin-left: 0.5rem;
+}
+
+.legend-hazard {
+  color: #e53935;
+  margin-left: 1rem;
+}
+
 .link-button {
   background: none;
   border: none;

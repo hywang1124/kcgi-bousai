@@ -11,8 +11,14 @@
   },
   "nav": {
     "shelters": "Shelters",
+    "map": "Map",
     "chat": "Ask AI",
     "admin": "Admin"
+  },
+  "map": {
+    "heading": "Disaster Map",
+    "shelters": "Shelters",
+    "hazardZones": "Hazard zones"
   },
   "shelters": {
     "heading": "Evacuation Shelters",

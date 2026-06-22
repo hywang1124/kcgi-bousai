@@ -2,11 +2,12 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from './components/LanguageSwitcher'
 import { SheltersPage } from './pages/SheltersPage'
+import { MapPage } from './pages/MapPage'
 import { ChatPage } from './pages/ChatPage'
 import { AdminPage } from './pages/AdminPage'
 import './App.css'
 
-type View = 'shelters' | 'chat' | 'admin'
+type View = 'shelters' | 'map' | 'chat' | 'admin'
 
 function App() {
   const { t } = useTranslation()
@@ -32,6 +33,13 @@ function App() {
         </button>
         <button
           type="button"
+          onClick={() => setView('map')}
+          disabled={view === 'map'}
+        >
+          {t('nav.map')}
+        </button>
+        <button
+          type="button"
           onClick={() => setView('chat')}
           disabled={view === 'chat'}
         >
@@ -48,6 +56,7 @@ function App() {
 
       <main>
         {view === 'shelters' && <SheltersPage />}
+        {view === 'map' && <MapPage />}
         {view === 'chat' && <ChatPage />}
         {view === 'admin' && <AdminPage />}
       </main>

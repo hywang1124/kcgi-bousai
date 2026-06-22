@@ -113,6 +113,17 @@ class ApiSmokeTest {
     }
 
     @Test
+    void hazardZonesEndpointReturnsSeededData() throws Exception {
+        HttpResponse<String> res = http.send(
+                HttpRequest.newBuilder(URI.create(url("/api/v1/hazard-zones"))).GET().build(),
+                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+
+        assertEquals(200, res.statusCode());
+        assertTrue(res.body().contains("\"geojson\""), "response should include geojson geometry");
+        assertTrue(res.body().contains("FLOOD"), "response should include the seeded flood zone");
+    }
+
+    @Test
     void registerCreatesUserWithUserRole() throws Exception {
         String username = "user" + System.nanoTime();
         String body = "{\"username\":\"" + username + "\",\"password\":\"password123\"}";

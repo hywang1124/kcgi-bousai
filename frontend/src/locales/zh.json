@@ -11,8 +11,14 @@
   },
   "nav": {
     "shelters": "避难所",
+    "map": "地图",
     "chat": "AI 问答",
     "admin": "管理"
+  },
+  "map": {
+    "heading": "防灾地图",
+    "shelters": "避难所",
+    "hazardZones": "危险区域"
   },
   "shelters": {
     "heading": "避难所一览",

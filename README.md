@@ -49,6 +49,7 @@ npm run dev
 | メソッド | パス | 説明 |
 | --- | --- | --- |
 | GET | `/api/v1/shelters` | 避難所一覧（公開） |
+| GET | `/api/v1/hazard-zones` | 危険区域一覧（公開・GeoJSON ジオメトリ付き） |
 | POST | `/api/v1/chat` | 防災 AI 問答（公開・現在はモック実装。`{"question","lang"}`） |
 | POST | `/api/v1/auth/register` | セルフ登録（公開・既定ロール USER。`{"username","password"}`） |
 | POST | `/api/v1/auth/login` | ログインして JWT を取得（`{"username","password"}`） |

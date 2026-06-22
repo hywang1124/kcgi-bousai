@@ -11,8 +11,14 @@
   },
   "nav": {
     "shelters": "避難所",
+    "map": "地図",
     "chat": "AI相談",
     "admin": "管理"
+  },
+  "map": {
+    "heading": "防災マップ",
+    "shelters": "避難所",
+    "hazardZones": "危険区域"
   },
   "shelters": {
     "heading": "避難所一覧",

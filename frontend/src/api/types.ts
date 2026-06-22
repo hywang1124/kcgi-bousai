@@ -1,3 +1,22 @@
+/** 災害種別 */
+export type HazardType = 'FLOOD' | 'LANDSLIDE' | 'EARTHQUAKE' | 'TSUNAMI' | 'OTHER'
+
+/** 危険度 */
+export type SeverityLevel = 'LOW' | 'MEDIUM' | 'HIGH'
+
+/** 危険区域（/api/v1/hazard-zones） */
+export interface HazardZone {
+  id: number
+  type: HazardType
+  severity: SeverityLevel
+  nameJa: string
+  nameEn: string | null
+  nameZh: string | null
+  description: string | null
+  /** GeoJSON ジオメトリ文字列（JSON.parse して描画） */
+  geojson: string
+}
+
 /** ユーザ役割 */
 export type Role = 'ADMIN' | 'EDITOR' | 'USER'
 
