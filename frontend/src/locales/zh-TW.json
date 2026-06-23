@@ -1,0 +1,159 @@
+{
+  "app": {
+    "title": "防災地圖",
+    "subtitle": "不讓任何人掉隊的多語言防災資訊"
+  },
+  "language": {
+    "label": "語言",
+    "ja": "日本語",
+    "en": "English",
+    "zh": "简体中文",
+    "zh-TW": "繁體中文"
+  },
+  "nav": {
+    "home": "首頁",
+    "knowledge": "防災知識",
+    "shelters": "避難所·地圖",
+    "chat": "AI 問答",
+    "admin": "管理"
+  },
+  "home": {
+    "heroTitle": "防患於未然，人人都能用的防災地圖",
+    "heroSubtitle": "為在日生活打造的多語言防災入口：地震、海嘯、颱風等",
+    "heroCta": "查看避難所地圖",
+    "situationTitle": "日本的自然災害",
+    "situationBody": "日本位於四大板塊交界處，集中了世界上大量活火山，是著名的「災害大國」。人們與地震、海嘯、火山噴發、颱風、豪雨等多種災害相伴而居。正確的知識與日常的準備，能在關鍵時刻守護生命。",
+    "featuresTitle": "你可以做什麼",
+    "featureMapTitle": "避難所·防災地圖",
+    "featureMapDesc": "在地圖上查看最近的避難所與危險區域",
+    "featureKnowledgeTitle": "防災知識",
+    "featureKnowledgeDesc": "了解地震、海嘯、火山等災害及應對準備",
+    "featureAiTitle": "AI 防災問答",
+    "featureAiDesc": "用淺顯的語言提問防災相關問題"
+  },
+  "knowledge": {
+    "heading": "防災知識",
+    "lead": "介紹日本常見的自然災害，以及守護生命的準備方法。",
+    "tipsTitle": "準備與行動要點",
+    "earthquake": {
+      "name": "地震",
+      "summary": "日本大小地震頻繁發生，強烈搖晃會導致建築倒塌、家具翻倒。",
+      "tips": [
+        "先保護自己：蹲下、護頭、不要亂動",
+        "搖晃停止後再處理火源並確保出口",
+        "固定家具，並和家人確認好避難路線"
+      ]
+    },
+    "tsunami": {
+      "name": "海嘯",
+      "summary": "在海岸附近感到強烈或長時間的搖晃時，可能有海嘯來襲。",
+      "tips": [
+        "立即前往高地或海嘯避難大樓避難",
+        "發布海嘯警報時不要靠近海邊",
+        "往更高、更遠處轉移，確認安全前不要返回"
+      ]
+    },
+    "volcano": {
+      "name": "火山",
+      "summary": "日本有眾多活火山，噴發會帶來噴石、火山碎屑流和落塵。",
+      "tips": [
+        "遵守噴發警戒等級與禁止進入管制",
+        "登山時隨身攜帶頭盔和口罩",
+        "落塵時用護目鏡和口罩保護眼鼻口"
+      ]
+    },
+    "typhoon": {
+      "name": "颱風",
+      "summary": "夏秋季節來襲，帶來狂風、豪雨和暴潮。",
+      "tips": [
+        "及時關注最新氣象與避難資訊",
+        "收好屋外可能被吹走的物品",
+        "遠離河流和海邊，趁天亮盡早避難"
+      ]
+    },
+    "flood": {
+      "name": "洪水·淹水",
+      "summary": "豪雨和颱風會導致河流氾濫、市區積水。",
+      "tips": [
+        "提前在災害地圖上確認住所的風險等級",
+        "盡早轉移到高處（往樓上垂直避難也有效）",
+        "遠離地下道、地下空間和暴漲的水渠"
+      ]
+    }
+  },
+  "map": {
+    "heading": "防災地圖",
+    "shelters": "避難所",
+    "hazardZones": "危險區域"
+  },
+  "shelters": {
+    "heading": "避難所一覽",
+    "loading": "載入中…",
+    "error": "取得避難所失敗",
+    "empty": "暫無避難所",
+    "address": "地址",
+    "capacity": "容納人數",
+    "people": "人",
+    "facilities": "設施",
+    "distance": "距離",
+    "locating": "正在取得目前位置…",
+    "locationError": "無法取得目前位置"
+  },
+  "sort": {
+    "label": "排序",
+    "default": "預設",
+    "capacity": "容納人數",
+    "distance": "最近"
+  },
+  "chat": {
+    "heading": "向防災 AI 提問",
+    "placeholder": "例如：地震時該怎麼辦？",
+    "send": "提問",
+    "sending": "傳送中…",
+    "error": "傳送失敗",
+    "sources": "來源"
+  },
+  "register": {
+    "title": "建立帳號",
+    "submit": "註冊",
+    "toLogin": "返回登入",
+    "toRegister": "建立帳號",
+    "success": "註冊成功，請登入。",
+    "duplicate": "該使用者名稱已被使用",
+    "error": "註冊失敗"
+  },
+  "admin": {
+    "loginHeading": "管理員登入",
+    "username": "使用者名稱",
+    "password": "密碼",
+    "login": "登入",
+    "loggingIn": "登入中…",
+    "loginError": "登入失敗",
+    "invalidCredentials": "使用者名稱或密碼不正確",
+    "heading": "管理後台",
+    "console": "管理控制台",
+    "loggedInAs": "已登入",
+    "logout": "登出",
+    "noAccess": "沒有管理員權限",
+    "tabShelters": "避難所管理",
+    "tabUsers": "使用者管理",
+    "shelterAdmin": {
+      "create": "新增避難所",
+      "edit": "編輯",
+      "save": "儲存",
+      "cancel": "取消",
+      "delete": "刪除",
+      "nameJa": "名稱（日文）",
+      "nameEn": "名稱（英文）",
+      "nameZh": "名稱（中文）",
+      "lat": "緯度",
+      "lng": "經度",
+      "facilitiesHint": "設施（以逗號分隔）"
+    },
+    "userAdmin": {
+      "title": "使用者列表",
+      "username": "使用者名稱",
+      "role": "角色"
+    }
+  }
+}
