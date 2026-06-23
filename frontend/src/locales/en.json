@@ -27,7 +27,16 @@
     "address": "Address",
     "capacity": "Capacity",
     "people": "people",
-    "facilities": "Facilities"
+    "facilities": "Facilities",
+    "distance": "Distance",
+    "locating": "Getting your location…",
+    "locationError": "Could not get your location"
+  },
+  "sort": {
+    "label": "Sort",
+    "default": "Default",
+    "capacity": "Capacity",
+    "distance": "Nearest"
   },
   "chat": {
     "heading": "Ask the Disaster-Prevention AI",

@@ -27,7 +27,16 @@
     "address": "地址",
     "capacity": "容纳人数",
     "people": "人",
-    "facilities": "设施"
+    "facilities": "设施",
+    "distance": "距离",
+    "locating": "正在获取当前位置…",
+    "locationError": "无法获取当前位置"
+  },
+  "sort": {
+    "label": "排序",
+    "default": "默认",
+    "capacity": "容纳人数",
+    "distance": "最近"
   },
   "chat": {
     "heading": "向防灾 AI 提问",

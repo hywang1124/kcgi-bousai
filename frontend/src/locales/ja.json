@@ -27,7 +27,16 @@
     "address": "住所",
     "capacity": "収容人数",
     "people": "人",
-    "facilities": "設備"
+    "facilities": "設備",
+    "distance": "距離",
+    "locating": "現在地を取得中…",
+    "locationError": "現在地を取得できませんでした"
+  },
+  "sort": {
+    "label": "並べ替え",
+    "default": "既定",
+    "capacity": "収容人数",
+    "distance": "最寄り"
   },
   "chat": {
     "heading": "防災 AI に質問",

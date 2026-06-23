@@ -6,7 +6,7 @@ import type { Feature, Geometry } from 'geojson'
 import { fetchShelters } from '../api/shelters'
 import { fetchHazardZones } from '../api/hazardZones'
 import type { HazardZone, Shelter } from '../api/types'
-import { isValidLngLat, pointInGeometry } from '../lib/geo'
+import { haversineKm, isValidLngLat, pointInGeometry } from '../lib/geo'
 
 const CENTER: [number, number] = [135.768, 35.011]
 
@@ -37,6 +37,13 @@ interface ZoneGeom {
   geom: Geometry
 }
 
+type SortMode = 'default' | 'capacity' | 'distance'
+
+interface UserLocation {
+  lat: number
+  lng: number
+}
+
 /** 避難所一覧（左）と防災マップ（右）の連動ページ。
  *  避難所をクリックすると地図が移動し、その地点を含む危険区域がハイライトされる。 */
 export function SheltersMapPage() {
@@ -48,6 +55,10 @@ export function SheltersMapPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedId, setSelectedId] = useState<number | null>(null)
+  const [sortMode, setSortMode] = useState<SortMode>('default')
+  const [userLocation, setUserLocation] = useState<UserLocation | null>(null)
+  const [locating, setLocating] = useState(false)
+  const [geoError, setGeoError] = useState<string | null>(null)
 
   const containerRef = useRef<HTMLDivElement | null>(null)
   const markersRef = useRef<Map<number, maplibregl.Marker>>(new Map())
@@ -77,6 +88,58 @@ export function SheltersMapPage() {
     }
     return map
   }, [shelters, zoneGeoms])
+
+  // ユーザー位置からの距離（km）
+  const distances = useMemo<Map<number, number>>(() => {
+    const map = new Map<number, number>()
+    if (!userLocation) return map
+    for (const s of shelters) {
+      if (isValidLngLat(s.lng, s.lat)) {
+        map.set(s.id, haversineKm(userLocation.lat, userLocation.lng, s.lat, s.lng))
+      }
+    }
+    return map
+  }, [shelters, userLocation])
+
+  // 並べ替え後の一覧
+  const displayedShelters = useMemo<Shelter[]>(() => {
+    const arr = [...shelters]
+    if (sortMode === 'capacity') {
+      arr.sort((a, b) => (b.capacity ?? -1) - (a.capacity ?? -1))
+    } else if (sortMode === 'distance' && userLocation) {
+      arr.sort((a, b) => (distances.get(a.id) ?? Infinity) - (distances.get(b.id) ?? Infinity))
+    }
+    return arr
+  }, [shelters, sortMode, userLocation, distances])
+
+  function requestLocation() {
+    if (!('geolocation' in navigator)) {
+      setGeoError(t('shelters.locationError'))
+      return
+    }
+    setLocating(true)
+    setGeoError(null)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+        setSortMode('distance')
+        setLocating(false)
+      },
+      () => {
+        setGeoError(t('shelters.locationError'))
+        setLocating(false)
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    )
+  }
+
+  function handleDistanceSort() {
+    if (userLocation) {
+      setSortMode('distance')
+    } else {
+      requestLocation()
+    }
+  }
 
   // データ取得
   useEffect(() => {
@@ -153,6 +216,16 @@ export function SheltersMapPage() {
         markersRef.current.set(s.id, marker)
       }
 
+      // ユーザー現在地（緑マーカー）
+      if (userLocation && isValidLngLat(userLocation.lng, userLocation.lat)) {
+        new maplibregl.Marker({ color: '#2e7d32' })
+          .setLngLat([userLocation.lng, userLocation.lat])
+          .addTo(map)
+        if (selectedRef.current == null) {
+          map.flyTo({ center: [userLocation.lng, userLocation.lat], zoom: 13 })
+        }
+      }
+
       // 選択した避難所へ移動し、含まれる危険区域をハイライトする
       applyRef.current = (id: number) => {
         const shelter = shelters.find((x) => x.id === id)
@@ -196,7 +269,7 @@ export function SheltersMapPage() {
       applyRef.current = null
       map.remove()
     }
-  }, [lang, shelters, zoneGeoms])
+  }, [lang, shelters, zoneGeoms, userLocation])
 
   function handleSelect(id: number) {
     setSelectedId(id)
@@ -214,14 +287,34 @@ export function SheltersMapPage() {
       )}
       <div className="shelters-map">
         <div className="shelters-map-list">
+          <div className="sort-toolbar">
+            <span>{t('sort.label')}:</span>
+            <button type="button" disabled={sortMode === 'default'} onClick={() => setSortMode('default')}>
+              {t('sort.default')}
+            </button>
+            <button type="button" disabled={sortMode === 'capacity'} onClick={() => setSortMode('capacity')}>
+              {t('sort.capacity')}
+            </button>
+            <button
+              type="button"
+              disabled={(sortMode === 'distance' && !!userLocation) || locating}
+              onClick={handleDistanceSort}
+            >
+              {t('sort.distance')}
+            </button>
+          </div>
+          {locating && <p className="info">{t('shelters.locating')}</p>}
+          {geoError && <p role="alert">{geoError}</p>}
+
           {loading ? (
             <p>{t('shelters.loading')}</p>
           ) : shelters.length === 0 ? (
             <p>{t('shelters.empty')}</p>
           ) : (
             <ul className="shelter-list">
-              {shelters.map((s) => {
+              {displayedShelters.map((s) => {
                 const hazards = sheltersZones.get(s.id) ?? []
+                const distance = distances.get(s.id)
                 return (
                   <li key={s.id}>
                     <button
@@ -233,6 +326,11 @@ export function SheltersMapPage() {
                       {s.capacity != null && (
                         <span className="shelter-card-meta">
                           {t('shelters.capacity')}: {s.capacity} {t('shelters.people')}
+                        </span>
+                      )}
+                      {distance != null && (
+                        <span className="shelter-card-meta">
+                          {t('shelters.distance')}: {distance.toFixed(1)} km
                         </span>
                       )}
                       {hazards.length > 0 && (
