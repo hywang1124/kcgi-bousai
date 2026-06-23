@@ -117,6 +117,95 @@
   cursor: pointer;
 }
 
+.shelters-map {
+  display: flex;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.shelters-map-list {
+  flex: 0 0 300px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.shelters-map-canvas {
+  flex: 1 1 auto;
+  min-height: 360px;
+  height: 70vh;
+  border: 1px solid #8884;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+@media (max-width: 720px) {
+  .shelters-map {
+    flex-direction: column;
+  }
+  .shelters-map-list {
+    flex-basis: auto;
+    max-height: none;
+  }
+}
+
+.shelter-card-button {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.7rem;
+  border: 1px solid #8884;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.shelter-card-button:hover {
+  border-color: #6699ff;
+}
+
+.shelter-card-button.selected {
+  border-color: #1565c0;
+  background: rgba(21, 101, 192, 0.1);
+}
+
+.shelter-card-name {
+  font-weight: 700;
+}
+
+.shelter-card-meta {
+  font-size: 0.82rem;
+  opacity: 0.75;
+}
+
+.hazard-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.hazard-badge {
+  font-size: 0.72rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  color: #fff;
+}
+
+.hazard-badge.sev-HIGH {
+  background: #e53935;
+}
+
+.hazard-badge.sev-MEDIUM {
+  background: #fb8c00;
+}
+
+.hazard-badge.sev-LOW {
+  background: #c9a800;
+}
+
 .map-container {
   height: 70vh;
   min-height: 360px;
