@@ -5,17 +5,15 @@ import { HomePage } from './pages/HomePage'
 import { KnowledgePage } from './pages/KnowledgePage'
 import { SheltersMapPage } from './pages/SheltersMapPage'
 import { ChatPage } from './pages/ChatPage'
-import { AdminPage } from './pages/AdminPage'
 import './App.css'
 
-export type View = 'home' | 'knowledge' | 'shelters' | 'chat' | 'admin'
+export type View = 'home' | 'knowledge' | 'shelters' | 'chat'
 
 const NAV_ITEMS: { view: View; key: string }[] = [
   { view: 'home', key: 'nav.home' },
   { view: 'knowledge', key: 'nav.knowledge' },
   { view: 'shelters', key: 'nav.shelters' },
   { view: 'chat', key: 'nav.chat' },
-  { view: 'admin', key: 'nav.admin' },
 ]
 
 function App() {
@@ -54,7 +52,6 @@ function App() {
         {view === 'knowledge' && <KnowledgePage />}
         {view === 'shelters' && <SheltersMapPage />}
         {view === 'chat' && <ChatPage />}
-        {view === 'admin' && <AdminPage />}
       </main>
     </div>
   )

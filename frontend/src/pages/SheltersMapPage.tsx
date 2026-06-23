@@ -2,12 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import type { Feature, Geometry } from 'geojson'
-import { fetchHazardZones } from '../api/hazardZones'
-import type { HazardZone } from '../api/types'
+import type { Feature } from 'geojson'
 import { SHELTERS } from '../data/shelters'
 import type { HazardKind } from '../data/shelters'
-import { haversineKm, isValidLngLat, pointInGeometry } from '../lib/geo'
+import { haversineKm, isValidLngLat } from '../lib/geo'
 
 const CENTER: [number, number] = [135.768, 35.011]
 const HAZARD_ORDER: HazardKind[] = [
@@ -27,30 +25,16 @@ const OSM_STYLE: maplibregl.StyleSpecification = {
   layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
 }
 
-function localizedZoneName(z: HazardZone, lang: string): string {
-  if (lang.startsWith('en') && z.nameEn) return z.nameEn
-  if (lang.startsWith('zh') && z.nameZh) return z.nameZh
-  return z.nameJa
-}
-
-interface ZoneGeom {
-  zone: HazardZone
-  geom: Geometry
-}
-
 type SortMode = 'default' | 'distance'
 interface UserLocation {
   lat: number
   lng: number
 }
 
-/** 避難所一覧（左）＋防災マップ（右）。避難所は静的データ（国土地理院）から表示する。 */
+/** 避難所一覧（左）＋地図（右）。避難所は静的データ（国土地理院）から表示する。 */
 export function SheltersMapPage() {
-  const { t, i18n } = useTranslation()
-  const lang = i18n.language
+  const { t } = useTranslation()
 
-  const [zones, setZones] = useState<HazardZone[]>([])
-  const [error, setError] = useState<string | null>(null)
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [sortMode, setSortMode] = useState<SortMode>('default')
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null)
@@ -60,21 +44,10 @@ export function SheltersMapPage() {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const popupRef = useRef<maplibregl.Popup | null>(null)
-  const highlightedZonesRef = useRef<number[]>([])
   const prevShelterRef = useRef<number | null>(null)
   const applyRef = useRef<((id: number) => void) | null>(null)
   const selectedRef = useRef<number | null>(null)
   const pickRef = useRef<((id: number) => void) | null>(null)
-
-  const zoneGeoms = useMemo<ZoneGeom[]>(() => {
-    return zones.flatMap((zone) => {
-      try {
-        return [{ zone, geom: JSON.parse(zone.geojson) as Geometry }]
-      } catch {
-        return []
-      }
-    })
-  }, [zones])
 
   const distances = useMemo<Map<number, number>>(() => {
     const map = new Map<number, number>()
@@ -96,7 +69,7 @@ export function SheltersMapPage() {
     return SHELTERS
   }, [sortMode, userLocation, distances])
 
-  // 地図構築
+  // 地図構築（現在地が変わったら作り直す）
   useEffect(() => {
     if (!containerRef.current) return
     let cancelled = false
@@ -114,14 +87,13 @@ export function SheltersMapPage() {
     map.on('load', () => {
       if (cancelled) return
 
-      // 避難所（パフォーマンスのため円レイヤで描画）
-      const shelterFeatures: Feature[] = SHELTERS.filter((s) => isValidLngLat(s.lng, s.lat)).map((s) => ({
+      const features: Feature[] = SHELTERS.filter((s) => isValidLngLat(s.lng, s.lat)).map((s) => ({
         type: 'Feature',
         id: s.id,
         geometry: { type: 'Point', coordinates: [s.lng, s.lat] },
         properties: { name: s.name },
       }))
-      map.addSource('shelters', { type: 'geojson', data: { type: 'FeatureCollection', features: shelterFeatures } })
+      map.addSource('shelters', { type: 'geojson', data: { type: 'FeatureCollection', features } })
       map.addLayer({
         id: 'shelters-circles',
         type: 'circle',
@@ -134,37 +106,6 @@ export function SheltersMapPage() {
         },
       })
 
-      // 危険区域
-      const zoneFeatures: Feature[] = zoneGeoms.map((zg) => ({
-        type: 'Feature',
-        id: zg.zone.id,
-        geometry: zg.geom,
-        properties: { name: localizedZoneName(zg.zone, lang), severity: zg.zone.severity },
-      }))
-      map.addSource('hazard', { type: 'geojson', data: { type: 'FeatureCollection', features: zoneFeatures } })
-      map.addLayer({
-        id: 'hazard-fill',
-        type: 'fill',
-        source: 'hazard',
-        paint: {
-          'fill-color': [
-            'match', ['get', 'severity'],
-            'HIGH', '#e53935', 'MEDIUM', '#fb8c00', 'LOW', '#fdd835', '#9e9e9e',
-          ],
-          'fill-opacity': ['case', ['boolean', ['feature-state', 'highlight'], false], 0.5, 0.2],
-        },
-      })
-      map.addLayer({
-        id: 'hazard-outline',
-        type: 'line',
-        source: 'hazard',
-        paint: {
-          'line-color': ['case', ['boolean', ['feature-state', 'highlight'], false], '#ffeb3b', '#b71c1c'],
-          'line-width': ['case', ['boolean', ['feature-state', 'highlight'], false], 4, 1.5],
-        },
-      })
-
-      // ユーザー現在地
       if (userLocation && isValidLngLat(userLocation.lng, userLocation.lat)) {
         new maplibregl.Marker({ color: '#2e7d32' })
           .setLngLat([userLocation.lng, userLocation.lat])
@@ -190,28 +131,15 @@ export function SheltersMapPage() {
       applyRef.current = (id: number) => {
         const sh = SHELTERS.find((s) => s.id === id)
         if (!sh) return
-
         if (prevShelterRef.current != null) {
           map.setFeatureState({ source: 'shelters', id: prevShelterRef.current }, { selected: false })
         }
         map.setFeatureState({ source: 'shelters', id }, { selected: true })
         prevShelterRef.current = id
-
         if (isValidLngLat(sh.lng, sh.lat)) {
           map.flyTo({ center: [sh.lng, sh.lat], zoom: 15 })
           popupRef.current?.setLngLat([sh.lng, sh.lat]).setText(sh.name).addTo(map)
         }
-
-        for (const zid of highlightedZonesRef.current) {
-          map.setFeatureState({ source: 'hazard', id: zid }, { highlight: false })
-        }
-        const containing = zoneGeoms
-          .filter((zg) => isValidLngLat(sh.lng, sh.lat) && pointInGeometry(sh.lng, sh.lat, zg.geom))
-          .map((zg) => zg.zone.id)
-        for (const zid of containing) {
-          map.setFeatureState({ source: 'hazard', id: zid }, { highlight: true })
-        }
-        highlightedZonesRef.current = containing
       }
 
       if (selectedRef.current != null) {
@@ -226,7 +154,7 @@ export function SheltersMapPage() {
       mapRef.current = null
       map.remove()
     }
-  }, [lang, zoneGeoms, userLocation])
+  }, [userLocation])
 
   function handleSelect(id: number) {
     setSelectedId(id)
@@ -266,30 +194,10 @@ export function SheltersMapPage() {
     else requestLocation()
   }
 
-  // データ取得（危険区域のみバックエンドから）
-  useEffect(() => {
-    let active = true
-    fetchHazardZones()
-      .then((z) => {
-        if (active) setZones(z)
-      })
-      .catch((e: unknown) => {
-        if (active) setError(e instanceof Error ? e.message : String(e))
-      })
-    return () => {
-      active = false
-    }
-  }, [])
-
   return (
     <section>
       <h2>{t('map.heading')}</h2>
       <p className="home-lead">{t('shelters.count', { count: SHELTERS.length })}</p>
-      {error && (
-        <p role="alert">
-          {t('shelters.error')}: {error}
-        </p>
-      )}
 
       <div className="shelters-map">
         <div className="shelters-map-list">

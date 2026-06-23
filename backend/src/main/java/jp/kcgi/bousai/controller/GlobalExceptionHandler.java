@@ -5,12 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.stream.Collectors;
 
@@ -21,24 +19,6 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
-    /** 不正な引数 → 400 Bad Request */
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ProblemDetail handleIllegalArgument(IllegalArgumentException ex) {
-        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        problem.setTitle("Bad Request");
-        problem.setDetail(ex.getMessage());
-        return problem;
-    }
-
-    /** 認証失敗（資格情報の誤り・無効アカウント等） → 401 Unauthorized */
-    @ExceptionHandler(AuthenticationException.class)
-    public ProblemDetail handleAuthentication(AuthenticationException ex) {
-        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
-        problem.setTitle("Unauthorized");
-        problem.setDetail("ユーザ名またはパスワードが正しくありません。");
-        return problem;
-    }
 
     /** 読み取り不能なリクエストボディ（不正な JSON・文字コード等） → 400 Bad Request */
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -63,14 +43,6 @@ public class GlobalExceptionHandler {
 
     private String formatFieldError(FieldError error) {
         return error.getField() + ": " + error.getDefaultMessage();
-    }
-
-    /** 明示的な HTTP ステータス付き例外（409 重複・404 未検出など） → そのステータスで返す */
-    @ExceptionHandler(ResponseStatusException.class)
-    public ProblemDetail handleResponseStatus(ResponseStatusException ex) {
-        ProblemDetail problem = ProblemDetail.forStatus(ex.getStatusCode());
-        problem.setDetail(ex.getReason());
-        return problem;
     }
 
     /** 想定外の例外 → 500 Internal Server Error（詳細はログのみ、レスポンスには出さない） */
