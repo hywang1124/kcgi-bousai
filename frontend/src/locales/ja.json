@@ -14,8 +14,7 @@
     "home": "ホーム",
     "knowledge": "防災知識",
     "shelters": "避難所・地図",
-    "chat": "AI相談",
-    "admin": "管理"
+    "chat": "AI相談"
   },
   "home": {
     "heroTitle": "災害に備える、みんなの防災マップ",
@@ -25,7 +24,7 @@
     "situationBody": "日本は4つのプレートが接する場所に位置し、世界の活火山の多くが集中する「災害大国」です。地震・津波・火山・台風・豪雨など、さまざまな災害と隣り合わせで暮らしています。正しい知識と日頃の備えが、いざというときに命を守ります。",
     "featuresTitle": "できること",
     "featureMapTitle": "避難所・防災マップ",
-    "featureMapDesc": "最寄りの避難所と危険区域を地図で確認",
+    "featureMapDesc": "最寄りの避難所を地図で確認",
     "featureKnowledgeTitle": "防災知識",
     "featureKnowledgeDesc": "地震・津波・火山などの災害と備え方",
     "featureAiTitle": "AI 防災相談",
@@ -124,48 +123,5 @@
     "sending": "送信中…",
     "error": "送信に失敗しました",
     "sources": "参照元"
-  },
-  "register": {
-    "title": "アカウント作成",
-    "submit": "登録",
-    "toLogin": "ログインへ",
-    "toRegister": "アカウント作成",
-    "success": "登録しました。ログインしてください。",
-    "duplicate": "このユーザー名は既に使用されています",
-    "error": "登録に失敗しました"
-  },
-  "admin": {
-    "loginHeading": "管理者ログイン",
-    "username": "ユーザー名",
-    "password": "パスワード",
-    "login": "ログイン",
-    "loggingIn": "ログイン中…",
-    "loginError": "ログインに失敗しました",
-    "invalidCredentials": "ユーザー名またはパスワードが正しくありません",
-    "heading": "管理ダッシュボード",
-    "console": "管理コンソール",
-    "loggedInAs": "ログイン中",
-    "logout": "ログアウト",
-    "noAccess": "管理者権限がありません",
-    "tabShelters": "避難所管理",
-    "tabUsers": "ユーザ管理",
-    "shelterAdmin": {
-      "create": "避難所を新規作成",
-      "edit": "編集",
-      "save": "保存",
-      "cancel": "キャンセル",
-      "delete": "削除",
-      "nameJa": "名称（日本語）",
-      "nameEn": "名称（英語）",
-      "nameZh": "名称（中国語）",
-      "lat": "緯度",
-      "lng": "経度",
-      "facilitiesHint": "設備（カンマ区切り）"
-    },
-    "userAdmin": {
-      "title": "ユーザ一覧",
-      "username": "ユーザー名",
-      "role": "役割"
-    }
   }
 }

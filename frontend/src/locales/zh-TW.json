@@ -14,8 +14,7 @@
     "home": "首頁",
     "knowledge": "防災知識",
     "shelters": "避難所·地圖",
-    "chat": "AI 問答",
-    "admin": "管理"
+    "chat": "AI 問答"
   },
   "home": {
     "heroTitle": "防患於未然，人人都能用的防災地圖",
@@ -25,7 +24,7 @@
     "situationBody": "日本位於四大板塊交界處，集中了世界上大量活火山，是著名的「災害大國」。人們與地震、海嘯、火山噴發、颱風、豪雨等多種災害相伴而居。正確的知識與日常的準備，能在關鍵時刻守護生命。",
     "featuresTitle": "你可以做什麼",
     "featureMapTitle": "避難所·防災地圖",
-    "featureMapDesc": "在地圖上查看最近的避難所與危險區域",
+    "featureMapDesc": "在地圖上查看最近的避難所",
     "featureKnowledgeTitle": "防災知識",
     "featureKnowledgeDesc": "了解地震、海嘯、火山等災害及應對準備",
     "featureAiTitle": "AI 防災問答",
@@ -124,48 +123,5 @@
     "sending": "傳送中…",
     "error": "傳送失敗",
     "sources": "來源"
-  },
-  "register": {
-    "title": "建立帳號",
-    "submit": "註冊",
-    "toLogin": "返回登入",
-    "toRegister": "建立帳號",
-    "success": "註冊成功，請登入。",
-    "duplicate": "該使用者名稱已被使用",
-    "error": "註冊失敗"
-  },
-  "admin": {
-    "loginHeading": "管理員登入",
-    "username": "使用者名稱",
-    "password": "密碼",
-    "login": "登入",
-    "loggingIn": "登入中…",
-    "loginError": "登入失敗",
-    "invalidCredentials": "使用者名稱或密碼不正確",
-    "heading": "管理後台",
-    "console": "管理控制台",
-    "loggedInAs": "已登入",
-    "logout": "登出",
-    "noAccess": "沒有管理員權限",
-    "tabShelters": "避難所管理",
-    "tabUsers": "使用者管理",
-    "shelterAdmin": {
-      "create": "新增避難所",
-      "edit": "編輯",
-      "save": "儲存",
-      "cancel": "取消",
-      "delete": "刪除",
-      "nameJa": "名稱（日文）",
-      "nameEn": "名稱（英文）",
-      "nameZh": "名稱（中文）",
-      "lat": "緯度",
-      "lng": "經度",
-      "facilitiesHint": "設施（以逗號分隔）"
-    },
-    "userAdmin": {
-      "title": "使用者列表",
-      "username": "使用者名稱",
-      "role": "角色"
-    }
   }
 }
