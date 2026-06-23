@@ -264,6 +264,21 @@
   background: #c9a800;
 }
 
+.type-badge {
+  font-size: 0.7rem;
+  padding: 0.08rem 0.45rem;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand-dark);
+  border: 1px solid #cfe0f3;
+}
+
+.data-source {
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin: 0.8rem 0 0;
+}
+
 .map-container {
   height: 70vh;
   min-height: 360px;

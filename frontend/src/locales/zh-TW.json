@@ -97,7 +97,19 @@
     "facilities": "設施",
     "distance": "距離",
     "locating": "正在取得目前位置…",
-    "locationError": "無法取得目前位置"
+    "locationError": "無法取得目前位置",
+    "count": "共 {{count}} 處",
+    "dataSource": "資料來源：日本國土地理院「指定緊急避難場所資料」（京都市）"
+  },
+  "hazardType": {
+    "flood": "洪水",
+    "landslide": "土砂災害",
+    "stormSurge": "暴潮",
+    "earthquake": "地震",
+    "tsunami": "海嘯",
+    "fire": "大規模火災",
+    "inlandFlood": "內水氾濫",
+    "volcano": "火山"
   },
   "sort": {
     "label": "排序",

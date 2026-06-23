@@ -30,16 +30,6 @@ class ApiSmokeTest {
     }
 
     @Test
-    void sheltersEndpointReturnsSeededData() throws Exception {
-        HttpResponse<String> res = http.send(
-                HttpRequest.newBuilder(URI.create(url("/api/v1/shelters"))).GET().build(),
-                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-
-        assertEquals(200, res.statusCode());
-        assertTrue(res.body().contains("nameJa"), "shelters response should contain nameJa");
-    }
-
-    @Test
     void chatEndpointReturnsAnswer() throws Exception {
         String body = "{\"question\":\"地震が来たらどうすればいい？\",\"lang\":\"ja\"}";
         HttpResponse<String> res = http.send(
@@ -136,43 +126,6 @@ class ApiSmokeTest {
 
         assertEquals(201, res.statusCode());
         assertTrue(res.body().contains("\"role\":\"USER\""), "new user should default to USER role");
-    }
-
-    @Test
-    void shelterWriteRequiresAuthentication() throws Exception {
-        String body = "{\"nameJa\":\"テスト\",\"lat\":35.0,\"lng\":135.0}";
-        HttpResponse<String> res = http.send(
-                HttpRequest.newBuilder(URI.create(url("/api/v1/shelters")))
-                        .header("Content-Type", "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
-                        .build(),
-                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-
-        assertEquals(401, res.statusCode());
-    }
-
-    @Test
-    void adminCanCreateAndDeleteShelter() throws Exception {
-        String token = adminToken();
-        String body = "{\"nameJa\":\"テスト避難所\",\"lat\":35.01,\"lng\":135.76,\"capacity\":100,\"facilities\":[\"水\",\"毛布\"]}";
-        HttpResponse<String> created = http.send(
-                HttpRequest.newBuilder(URI.create(url("/api/v1/shelters")))
-                        .header("Content-Type", "application/json")
-                        .header("Authorization", "Bearer " + token)
-                        .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
-                        .build(),
-                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-        assertEquals(201, created.statusCode());
-
-        long id = extractJsonNumber(created.body(), "id");
-        assertTrue(id > 0, "created shelter should have an id");
-
-        HttpResponse<String> deleted = http.send(
-                HttpRequest.newBuilder(URI.create(url("/api/v1/shelters/" + id)))
-                        .header("Authorization", "Bearer " + token)
-                        .DELETE().build(),
-                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-        assertEquals(204, deleted.statusCode());
     }
 
     @Test

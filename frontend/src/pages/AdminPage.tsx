@@ -11,11 +11,9 @@ import {
 } from '../api/auth'
 import type { AdminMe } from '../api/types'
 import { clearToken, getToken, setToken } from '../auth/token'
-import { ShelterAdmin } from '../components/ShelterAdmin'
 import { UserAdmin } from '../components/UserAdmin'
 
 type AuthMode = 'login' | 'register'
-type ConsoleTab = 'shelters' | 'users'
 
 export function AdminPage() {
   const { t } = useTranslation()
@@ -23,7 +21,6 @@ export function AdminPage() {
   const [me, setMe] = useState<AdminMe | null>(null)
   const [accessDenied, setAccessDenied] = useState(false)
   const [authMode, setAuthMode] = useState<AuthMode>('login')
-  const [tab, setTab] = useState<ConsoleTab>('shelters')
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -112,15 +109,7 @@ export function AdminPage() {
             {t('admin.logout')}
           </button>
         </p>
-        <nav className="admin-tabs">
-          <button type="button" disabled={tab === 'shelters'} onClick={() => setTab('shelters')}>
-            {t('admin.tabShelters')}
-          </button>
-          <button type="button" disabled={tab === 'users'} onClick={() => setTab('users')}>
-            {t('admin.tabUsers')}
-          </button>
-        </nav>
-        {tab === 'shelters' ? <ShelterAdmin token={token} /> : <UserAdmin token={token} />}
+        <UserAdmin token={token} />
       </section>
     )
   }

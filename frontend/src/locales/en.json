@@ -97,7 +97,19 @@
     "facilities": "Facilities",
     "distance": "Distance",
     "locating": "Getting your location…",
-    "locationError": "Could not get your location"
+    "locationError": "Could not get your location",
+    "count": "{{count}} sites",
+    "dataSource": "Source: GSI \"Designated Emergency Evacuation Site Data\" (Kyoto City)"
+  },
+  "hazardType": {
+    "flood": "Flood",
+    "landslide": "Landslide",
+    "stormSurge": "Storm surge",
+    "earthquake": "Earthquake",
+    "tsunami": "Tsunami",
+    "fire": "Large fire",
+    "inlandFlood": "Inland flooding",
+    "volcano": "Volcano"
   },
   "sort": {
     "label": "Sort",

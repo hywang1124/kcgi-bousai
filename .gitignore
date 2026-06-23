@@ -11,7 +11,9 @@
 .idea
 
 # 作業ディレクトリ次第でルートにも生成され得る SQLite / 機密
-data/
+# （SQLite の出力先のみ。frontend/src/data 等のソースは対象外にするため anchored）
+/data/
+/backend/data/
 *.db
 *.db-journal
 .env
