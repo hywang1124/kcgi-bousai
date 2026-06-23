@@ -10,9 +10,75 @@
     "zh": "中文"
   },
   "nav": {
+    "home": "Home",
+    "knowledge": "Disaster Info",
     "shelters": "Shelters & Map",
     "chat": "Ask AI",
     "admin": "Admin"
+  },
+  "home": {
+    "heroTitle": "Be ready for disasters — the map for everyone",
+    "heroSubtitle": "A multilingual disaster-prevention portal for living safely in Japan: earthquakes, tsunamis, typhoons and more",
+    "heroCta": "Open the shelter map",
+    "situationTitle": "Natural disasters in Japan",
+    "situationBody": "Japan sits where four tectonic plates meet and is home to many of the world's active volcanoes. People live alongside earthquakes, tsunamis, volcanic eruptions, typhoons and heavy rain. The right knowledge and everyday preparation save lives when disaster strikes.",
+    "featuresTitle": "What you can do here",
+    "featureMapTitle": "Shelters & Map",
+    "featureMapDesc": "Find the nearest shelters and hazard zones on the map",
+    "featureKnowledgeTitle": "Disaster Info",
+    "featureKnowledgeDesc": "Learn about earthquakes, tsunamis, volcanoes and how to prepare",
+    "featureAiTitle": "AI Disaster Q&A",
+    "featureAiDesc": "Ask about disaster prevention in plain language"
+  },
+  "knowledge": {
+    "heading": "Disaster Info",
+    "lead": "An introduction to the natural disasters common in Japan and how to prepare for them.",
+    "tipsTitle": "Key points to prepare and act",
+    "earthquake": {
+      "name": "Earthquake",
+      "summary": "Earthquakes large and small happen often in Japan; strong shaking can collapse buildings and topple furniture.",
+      "tips": [
+        "Protect yourself first: Drop, Cover, Hold On",
+        "After the shaking stops, turn off fire sources and secure an exit",
+        "Fix furniture in place and check evacuation routes with your family"
+      ]
+    },
+    "tsunami": {
+      "name": "Tsunami",
+      "summary": "If you feel strong or long shaking near the coast, a tsunami may be coming.",
+      "tips": [
+        "Evacuate immediately to high ground or a tsunami evacuation building",
+        "Stay away from the sea when a tsunami warning is issued",
+        "Go higher and farther — do not return until it is confirmed safe"
+      ]
+    },
+    "volcano": {
+      "name": "Volcano",
+      "summary": "Japan has many active volcanoes; eruptions bring flying rocks, pyroclastic flows and ashfall.",
+      "tips": [
+        "Follow eruption warning levels and access restrictions",
+        "Carry a helmet and mask when hiking volcanoes",
+        "During ashfall, protect your eyes, nose and mouth with goggles and a mask"
+      ]
+    },
+    "typhoon": {
+      "name": "Typhoon",
+      "summary": "Typhoons approach from summer to autumn, bringing violent winds, heavy rain and storm surges.",
+      "tips": [
+        "Check the latest weather and evacuation information frequently",
+        "Put away outdoor items that could blow away",
+        "Stay away from rivers and the sea, and evacuate early while it is light"
+      ]
+    },
+    "flood": {
+      "name": "Flood",
+      "summary": "Heavy rain and typhoons can cause rivers to overflow and urban areas to flood.",
+      "tips": [
+        "Check your home's risk level on the hazard map in advance",
+        "Move to higher ground early (going to upper floors also helps)",
+        "Avoid underpasses, basements and swollen channels"
+      ]
+    }
   },
   "map": {
     "heading": "Disaster Map",
