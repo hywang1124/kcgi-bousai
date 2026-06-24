@@ -23,7 +23,7 @@
 | Web | spring-boot-starter-webmvc | REST API |
 | 校验 | spring-boot-starter-validation | DTO 校验 |
 | 监控 | spring-boot-starter-actuator | 健康检查 |
-| **AI** | **Spring AI 2.0.x**（`spring-ai-starter-model-openai`） | 防灾 AI 问答（RAG）；当前为 Mock 实现，API key 以后再接 |
+| **AI** | **Spring AI 2.0.x**（`spring-ai-starter-model-anthropic`） | 防灾 AI 问答（RAG）；LLM 为 **Claude**（`claude-opus-4-8`）。`ANTHROPIC_API_KEY` 未设置时自动回退到 Mock 实现 |
 | 前端 | **React + TypeScript + Vite** | SPA，部署到 GitHub Pages |
 | 地图 | **MapLibre GL JS** + OpenStreetMap | 展示避难所静态点位 |
 | i18n | react-i18next | 多语言（ja / en / zh / zh-TW） |
@@ -60,7 +60,7 @@
 └───────────────┬─────────────────────────────────────────┘
                 │
 ┌───────────────▼─────────────────────────────────────────┐
-│ 外部：LLM API (OpenAI 兼容)                               │
+│ 外部：Claude API (Anthropic)                              │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -70,7 +70,7 @@
 
 ## 4. 核心特性（Features）
 
-1. **AI 防灾问答（核心后端功能，Spring AI + RAG）**：自然语言提问，检索本地防灾文档生成回答，**按用户语言回答**并附来源。当前为 Mock 实现（无 key 可跑），详见 §6。
+1. **AI 防灾问答（核心后端功能，Spring AI + Claude + RAG）**：自然语言提问，检索本地防灾文档生成回答，**按用户语言回答**并附来源；支持非流式（`/api/v1/chat`）与流式 SSE（`/api/v1/chat/stream`）。`ANTHROPIC_API_KEY` 未设置时回退 Mock 实现（无 key 也可跑通链路），详见 §6。RAG 向量库目前**未导入语料**（基础设施已就位）。
 2. **避难所地图（纯前端静态数据）**：数据源为**国土地理院「指定緊急避難場所データ」（京都市）**，编译进前端；MapLibre 展示点位，支持按最近距离排序与地理定位。
 3. **防灾知识（纯前端静态）**：地震 / 海啸 / 火山 / 台风 / 洪水 的介绍与备灾要点。
 4. **多语言**：ja / en / zh / zh-TW，UI 与内容全部 i18n。
@@ -88,11 +88,15 @@
 
 ## 6. AI 模块规范（Spring AI）
 
-- 业务只依赖自定义 **`ChatAssistant` 接口**；当前实现是 **`MockChatAssistant`**（无 API key 也能跑通链路）。接真实 LLM 时新增 `SpringAiChatAssistant`（Spring AI `ChatClient` + `RetrievalAugmentationAdvisor`）替换，**不改 Controller/Service**。
-- **RAG**：防灾文档经 `EmbeddingModel` 向量化写入 `SimpleVectorStore`（文件）；提问时检索 Top-K 注入上下文。
+- 业务只依赖自定义 **`ChatAssistant` 接口**（`generate` 非流式 / `generateStream` 流式 `Flux<String>`）。两个实现由 `AiAssistantConfig` 按 `ANTHROPIC_API_KEY` 是否设置二选一注入，**不改 Controller/Service**：
+  - **`SpringAiChatAssistant`**：Spring AI `ChatClient` + Claude（`claude-opus-4-8`）+ `RetrievalAugmentationAdvisor`（RAG）。
+  - **`MockChatAssistant`**：无 key 时的回退，模拟流式输出，保证链路始终可跑通。
+- **RAG**：`VectorStoreDocumentRetriever` + `SimpleVectorStore`（内存/文件，`TransformersEmbeddingModel` 本地向量化，无需 API key）。**当前未导入防灾文档语料**，向量库为空；导入语料是下一步工作（见会话记录 / TODO）。
+- **流式**：`POST /api/v1/chat/stream` 返回 `text/event-stream`（Spring MVC 对 `Flux<String>` 自动按 `data:<chunk>\n\n` 分帧）。前端用 `fetch` + `ReadableStream` 解析。
 - **系统 prompt 红线**：仅基于检索到的防灾资料回答；信息不足时明确说「資料にありません」并引导联系当地自治体，**禁止编造避难所位置、电话、灾害指引**（安全关键）。
 - **多语言**：接收用户语言参数，用对应语言作答。
-- API key 等机密只走环境变量（见 §8），**绝不**写入代码或提交到 git。
+- API key（`ANTHROPIC_API_KEY`）等机密只走环境变量（见 §8），**绝不**写入代码或提交到 git。
+- **模型选择**：除非用户明确要求，新增/调整 LLM 调用一律使用 `claude-opus-4-8`；不要发送 `temperature`/`top_p`/`top_k`（该模型会拒绝）。
 
 ---
 
@@ -105,8 +109,8 @@ bousai/
 │   │   ├── controller/           # ChatController, GlobalExceptionHandler
 │   │   ├── service/              # ChatService
 │   │   ├── dto/                  # ChatRequest / ChatResponse
-│   │   ├── ai/                   # ChatAssistant + MockChatAssistant
-│   │   ├── config/               # CORS 等配置
+│   │   ├── ai/                   # ChatAssistant + SpringAiChatAssistant + MockChatAssistant
+│   │   ├── config/               # CORS、AiAssistantConfig（Claude/Mock 切替・RAG 配線）
 │   │   └── BousaiApplication.java
 │   ├── src/main/resources/application.properties
 │   └── pom.xml
@@ -129,7 +133,7 @@ bousai/
 - 注释 / Javadoc 用**日语**。
 
 **API**
-- 路径 `/api/v1/...`；请求/响应 JSON 字段 camelCase。后端当前对外端点仅 `/api/v1/chat` 与 `/actuator/health`。
+- 路径 `/api/v1/...`；请求/响应 JSON 字段 camelCase。后端当前对外端点：`/api/v1/chat`（非流式）、`/api/v1/chat/stream`（SSE 流式）、`/actuator/health`。
 
 **前端**
 - TypeScript 严格模式；组件函数式 + Hooks。
@@ -137,7 +141,7 @@ bousai/
 - 调后端：dev 用 Vite proxy（`/api`）；prod 用环境变量 `VITE_API_BASE_URL` 指向后端公网地址（见 §9）。
 
 **安全 / 机密 / CORS**
-- 机密（LLM API key）只用**环境变量**，本地放 `.env`（已 gitignore）。
+- 机密（`ANTHROPIC_API_KEY` 等）只用**环境变量**，本地放 `.env`（已 gitignore）。
 - **禁止**把任何密钥、`.env`、`node_modules/`、`target/` 提交到 git。
 - 后端须配置 **CORS** 放行前端来源（GitHub Pages 域名 + 本地 dev `http://localhost:5173`）。
 
