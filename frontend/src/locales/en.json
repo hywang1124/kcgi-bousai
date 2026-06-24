@@ -122,6 +122,7 @@
     "send": "Ask",
     "sending": "Sending…",
     "error": "Failed to send",
-    "sources": "Sources"
+    "sources": "Sources",
+    "thinking": "Thinking…"
   }
 }

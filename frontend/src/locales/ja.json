@@ -122,6 +122,7 @@
     "send": "質問する",
     "sending": "送信中…",
     "error": "送信に失敗しました",
-    "sources": "参照元"
+    "sources": "参照元",
+    "thinking": "考え中…"
   }
 }

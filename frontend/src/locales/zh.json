@@ -122,6 +122,7 @@
     "send": "提问",
     "sending": "发送中…",
     "error": "发送失败",
-    "sources": "来源"
+    "sources": "来源",
+    "thinking": "思考中…"
   }
 }

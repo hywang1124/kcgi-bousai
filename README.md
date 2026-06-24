@@ -51,7 +51,8 @@ npm run dev
 
 | メソッド | パス | 説明 |
 | --- | --- | --- |
-| POST | `/api/v1/chat` | 防災 AI 問答（公開・現在はモック実装。`{"question","lang"}`） |
+| POST | `/api/v1/chat` | 防災 AI 問答（非ストリーミング。`{"question","lang"}`） |
+| POST | `/api/v1/chat/stream` | 防災 AI 問答（ストリーミング、SSE。テキスト断片を逐次返す） |
 | GET | `/actuator/health` | ヘルスチェック |
 
 ## テスト / ビルド
@@ -82,11 +83,11 @@ npm run lint
 - `mvn clean package` で jar を作り `java -jar target/bousai-0.0.1-SNAPSHOT.jar` で起動、または Docker 化して小型クラウド / コンテナ基盤へ。
 - 環境変数：
   - `APP_CORS_ALLOWED_ORIGINS` … CORS 許可オリジン（カンマ区切り）。本番は GitHub Pages のドメイン（例 `https://<user>.github.io`）を指定。
-  - （将来 LLM 接続時）LLM API key も環境変数で注入する。
+  - `ANTHROPIC_API_KEY` … Claude（Anthropic）の API キー。未設定の場合はモック実装にフォールバックする。
 - **データベース不要**。
 
 ## 注意
 
-- **AI はモック実装**：LLM 未接続。`ChatAssistant` インタフェースの実装を Spring AI（`ChatClient` + RAG）に差し替え、API キーを環境変数で渡す予定（[CLAUDE.md](CLAUDE.md) §6）。
+- **AI 問答**：Spring AI（`ChatClient`）+ Claude（`claude-opus-4-8`）+ RAG（`RetrievalAugmentationAdvisor` / `SimpleVectorStore`）で実装。`ANTHROPIC_API_KEY` 未設定時は安全なモック実装にフォールバックする（`AiAssistantConfig` 参照）。RAG の語料（防災文書）は現時点で未投入（[CLAUDE.md](CLAUDE.md) §6）。
 - **避難所データ**は実在の公的データ（国土地理院「指定緊急避難場所データ」京都市）。座標を捏造しない。
 - **機密情報**（LLM API キー等）は環境変数のみ。`.env` はコミット禁止。

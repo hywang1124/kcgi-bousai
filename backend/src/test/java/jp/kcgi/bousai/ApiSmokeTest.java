@@ -45,6 +45,20 @@ class ApiSmokeTest {
     }
 
     @Test
+    void chatStreamEndpointReturnsSseChunks() throws Exception {
+        String body = "{\"question\":\"地震が来たらどうすればいい？\",\"lang\":\"ja\"}";
+        HttpResponse<String> res = http.send(
+                HttpRequest.newBuilder(URI.create(url("/api/v1/chat/stream")))
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
+                        .build(),
+                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+
+        assertEquals(200, res.statusCode());
+        assertTrue(res.body().contains("data:"), "should contain SSE data frames");
+    }
+
+    @Test
     void chatEndpointRejectsBlankQuestion() throws Exception {
         String body = "{\"question\":\"  \"}";
         HttpResponse<String> res = http.send(
