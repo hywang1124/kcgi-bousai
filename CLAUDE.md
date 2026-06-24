@@ -93,6 +93,7 @@
   - **`MockChatAssistant`**：无 key 时的回退，模拟流式输出，保证链路始终可跑通。
 - **RAG**：`VectorStoreDocumentRetriever` + `SimpleVectorStore`（文件持久化 `backend/data/vector-store.json`，gitignore 对象）。语料来自内閣府防災情報・首相官邸防災ページ・国土交通省「川の防災情報」・気象庁多言語ページ・東京都防災ホームページ等官方网站，存于 `backend/src/main/resources/rag-corpus/*.md`（各文件首行注明出典 URL），由 `RagCorpusLoader` 在启动时切分・向量化并写入持久化文件（已存在则直接加载，不重新嵌入）。
 - **嵌入模型**：`TransformersEmbeddingModel`（本地 ONNX，无需 API key），使用多语言模型 `Xenova/paraphrase-multilingual-MiniLM-L12-v2`（在 `AiAssistantConfig` 中指定 `modelResource`/`tokenizerResource`）。**不要改回默认的 `all-MiniLM-L6-v2`**——该模型对日语语义相似度过低（实测 0.25–0.46），会导致 `SpringAiChatAssistant` 中配置的 `similarityThreshold(0.5)` 永远检索不到任何文档。
+- **`ContextualQueryAugmenter` 必须设置 `allowEmptyContext(true)`**（`SpringAiChatAssistant.buildRagAdvisor`）。Spring AI 默认行为是：检索不到资料（相似度低于阈值）时，**直接丢弃用户原始问题**，替换成英文固定文案「The user query is outside your knowledge base...」发给 LLM——这会让安全红线（下面的「資料にありません」逻辑）完全失效，且用户问题本身永远不会到达 Claude。已通过 `SpringAiChatAssistantRagTest` 验证修复后两种情形：命中资料时正确注入上下文；未命中时原始问题原样传递。
 - **流式**：`POST /api/v1/chat/stream` 返回 `text/event-stream`（Spring MVC 对 `Flux<String>` 自动按 `data:<chunk>\n\n` 分帧）。前端用 `fetch` + `ReadableStream` 解析。
 - **系统 prompt 红线**：仅基于检索到的防灾资料回答；信息不足时明确说「資料にありません」并引导联系当地自治体，**禁止编造避难所位置、电话、灾害指引**（安全关键）。
 - **多语言**：接收用户语言参数，用对应语言作答。
