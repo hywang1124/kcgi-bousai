@@ -2,6 +2,7 @@ package jp.kcgi.bousai.config;
 
 import jp.kcgi.bousai.ai.ChatAssistant;
 import jp.kcgi.bousai.ai.MockChatAssistant;
+import jp.kcgi.bousai.ai.RagCorpusLoader;
 import jp.kcgi.bousai.ai.SpringAiChatAssistant;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
@@ -21,10 +22,21 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
  *
  * <p>環境変数 {@code ANTHROPIC_API_KEY}（= {@code spring.ai.anthropic.api-key}）が
  * 設定されている場合は Spring AI（Claude + RAG）実装、未設定の場合はモック実装を使う。
- * RAG の語料（防災文書）は現時点では未投入で、{@code VectorStore} は空のまま配線する。</p>
+ * RAG の語料（防災文書、{@code classpath:rag-corpus/}）は {@link RagCorpusLoader} が
+ * 起動時にベクトルストアへ投入する。</p>
  */
 @Configuration
 public class AiAssistantConfig {
+
+    /**
+     * 多言語対応の埋め込みモデル（ONNX）。既定の {@code all-MiniLM-L6-v2} は英語中心で
+     * 日本語の類似度スコアが低く RAG の類似度閾値（0.5）を満たせないため、多言語モデルに
+     * 差し替える。
+     */
+    private static final String MULTILINGUAL_MODEL_URI =
+            "https://huggingface.co/Xenova/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/onnx/model.onnx";
+    private static final String MULTILINGUAL_TOKENIZER_URI =
+            "https://huggingface.co/Xenova/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/tokenizer.json";
 
     /** Anthropic API キーが設定されているかどうかの条件。 */
     static class AnthropicApiKeyPresent implements Condition {
@@ -39,6 +51,8 @@ public class AiAssistantConfig {
     @Conditional(AnthropicApiKeyPresent.class)
     public EmbeddingModel embeddingModel() throws Exception {
         TransformersEmbeddingModel embeddingModel = new TransformersEmbeddingModel();
+        embeddingModel.setModelResource(MULTILINGUAL_MODEL_URI);
+        embeddingModel.setTokenizerResource(MULTILINGUAL_TOKENIZER_URI);
         embeddingModel.afterPropertiesSet();
         return embeddingModel;
     }
@@ -53,6 +67,12 @@ public class AiAssistantConfig {
     @Conditional(AnthropicApiKeyPresent.class)
     public ChatAssistant springAiChatAssistant(AnthropicChatModel chatModel, VectorStore vectorStore) {
         return new SpringAiChatAssistant(chatModel, vectorStore);
+    }
+
+    @Bean
+    @Conditional(AnthropicApiKeyPresent.class)
+    public RagCorpusLoader ragCorpusLoader(VectorStore vectorStore) {
+        return new RagCorpusLoader(vectorStore);
     }
 
     @Bean

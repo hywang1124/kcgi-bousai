@@ -88,6 +88,6 @@ npm run lint
 
 ## 注意
 
-- **AI 問答**：Spring AI（`ChatClient`）+ Claude（`claude-opus-4-8`）+ RAG（`RetrievalAugmentationAdvisor` / `SimpleVectorStore`）で実装。`ANTHROPIC_API_KEY` 未設定時は安全なモック実装にフォールバックする（`AiAssistantConfig` 参照）。RAG の語料（防災文書）は現時点で未投入（[CLAUDE.md](CLAUDE.md) §6）。
+- **AI 問答**：Spring AI（`ChatClient`）+ Claude（`claude-opus-4-8`）+ RAG（`RetrievalAugmentationAdvisor` / `SimpleVectorStore`）で実装。`ANTHROPIC_API_KEY` 未設定時は安全なモック実装にフォールバックする（`AiAssistantConfig` 参照）。RAG の語料は内閣府防災情報・首相官邸・国土交通省・気象庁・東京都防災ホームページ等の公式サイトから取得し（`backend/src/main/resources/rag-corpus/`）、起動時に多言語埋め込みモデルでベクトル化される（[CLAUDE.md](CLAUDE.md) §6）。
 - **避難所データ**は実在の公的データ（国土地理院「指定緊急避難場所データ」京都市）。座標を捏造しない。
 - **機密情報**（LLM API キー等）は環境変数のみ。`.env` はコミット禁止。
