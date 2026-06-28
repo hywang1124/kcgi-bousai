@@ -1,5 +1,7 @@
 package jp.kcgi.bousai.ai;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.openai.OpenAiChatModel;
@@ -11,6 +13,7 @@ import org.springframework.ai.vectorstore.VectorStore;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Spring AI（{@code ChatClient}）+ OpenAI + RAG による {@link ChatAssistant} 実装。
@@ -28,6 +31,8 @@ import java.util.List;
  * system prompt の指示（資料が無ければ「資料にありません」と明示する）に委ねる。</p>
  */
 public class SpringAiChatAssistant implements ChatAssistant {
+
+    private static final Logger openAiRequestLog = LoggerFactory.getLogger("jp.kcgi.bousai.openai");
 
     private static final String SYSTEM_TEMPLATE = """
             あなたは防災情報アシスタントです。次の方針を厳守してください。
@@ -65,20 +70,74 @@ public class SpringAiChatAssistant implements ChatAssistant {
 
     @Override
     public ChatAnswer generate(String question, String lang) {
-        String text = chatClient.prompt()
-                .system(SYSTEM_TEMPLATE.formatted(lang))
-                .user(question)
-                .call()
-                .content();
-        return new ChatAnswer(text, List.of());
+        String requestId = UUID.randomUUID().toString();
+        long startedAt = System.currentTimeMillis();
+        logOpenAiRequestStart(requestId, "chat", question, lang);
+        try {
+            String text = chatClient.prompt()
+                    .system(SYSTEM_TEMPLATE.formatted(lang))
+                    .user(question)
+                    .call()
+                    .content();
+            logOpenAiRequestEnd(requestId, "chat", startedAt, text);
+            return new ChatAnswer(text, List.of());
+        } catch (RuntimeException error) {
+            logOpenAiRequestError(requestId, "chat", startedAt, error);
+            throw error;
+        }
     }
 
     @Override
     public Flux<String> generateStream(String question, String lang) {
+        String requestId = UUID.randomUUID().toString();
+        long startedAt = System.currentTimeMillis();
+        StringBuilder answer = new StringBuilder();
+        logOpenAiRequestStart(requestId, "stream", question, lang);
         return chatClient.prompt()
                 .system(SYSTEM_TEMPLATE.formatted(lang))
                 .user(question)
                 .stream()
-                .content();
+                .content()
+                .doOnNext(answer::append)
+                .doOnComplete(() -> logOpenAiRequestEnd(requestId, "stream", startedAt, answer.toString()))
+                .doOnError(error -> logOpenAiRequestError(requestId, "stream", startedAt, error));
+    }
+
+    private static void logOpenAiRequestStart(String requestId, String mode, String question, String lang) {
+        openAiRequestLog.info(
+                "openai_request_start requestId={} mode={} lang={} questionLength={} question=\"{}\"",
+                requestId,
+                mode,
+                lang,
+                question.length(),
+                escapeLogValue(question));
+    }
+
+    private static void logOpenAiRequestEnd(String requestId, String mode, long startedAt, String answer) {
+        openAiRequestLog.info(
+                "openai_request_end requestId={} mode={} durationMs={} answerLength={} answer=\"{}\"",
+                requestId,
+                mode,
+                System.currentTimeMillis() - startedAt,
+                answer.length(),
+                escapeLogValue(answer));
+    }
+
+    private static void logOpenAiRequestError(String requestId, String mode, long startedAt, Throwable error) {
+        openAiRequestLog.warn(
+                "openai_request_error requestId={} mode={} durationMs={} errorType={} message=\"{}\"",
+                requestId,
+                mode,
+                System.currentTimeMillis() - startedAt,
+                error.getClass().getSimpleName(),
+                escapeLogValue(error.getMessage() == null ? "" : error.getMessage()));
+    }
+
+    private static String escapeLogValue(String value) {
+        return value
+                .replace("\\", "\\\\")
+                .replace("\r", "\\r")
+                .replace("\n", "\\n")
+                .replace("\"", "\\\"");
     }
 }

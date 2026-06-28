@@ -23,6 +23,7 @@
 | Web | spring-boot-starter-webmvc | REST API |
 | 校验 | spring-boot-starter-validation | DTO 校验 |
 | 监控 | spring-boot-starter-actuator | 健康检查 |
+| 日志 | Spring Boot 默认 Logback + SLF4J | 本地控制台 / 生产文件 / OpenAI 专用文件 |
 | **AI** | **Spring AI 2.0.x**（`spring-ai-starter-model-openai`） | 防灾 AI 问答（RAG）；LLM 为 **OpenAI**（`gpt-4.1`）。`OPENAI_API_KEY` 未设置时自动回退到 Mock 实现 |
 | 前端 | **React + TypeScript + Vite** | SPA，部署到 GitHub Pages |
 | 地图 | **MapLibre GL JS** + OpenStreetMap | 展示避难所静态点位 |
@@ -97,6 +98,7 @@
 - **流式**：`POST /api/v1/chat/stream` 返回 `text/event-stream`（Spring MVC 对 `Flux<String>` 自动按 `data:<chunk>\n\n` 分帧）。前端用 `fetch` + `ReadableStream` 解析。
 - **系统 prompt 红线**：仅基于检索到的防灾资料回答；信息不足时明确说「資料にありません」并引导联系当地自治体，**禁止编造避难所位置、电话、灾害指引**（安全关键）。
 - **多语言**：接收用户语言参数，用对应语言作答。
+- **OpenAI 调用日志**：`SpringAiChatAssistant` 使用专用 logger `jp.kcgi.bousai.openai` 记录 OpenAI request start/end/error；日志内容不得包含 API key、Authorization header。请求问题与返回内容需完整记录（仅转义换行/引号，避免破坏单行日志格式）。
 - API key（`OPENAI_API_KEY`）等机密只走环境变量（见 §8），**绝不**写入代码或提交到 git。
 - **模型选择**：除非用户明确要求，新增/调整 LLM 调用一律使用 `gpt-4.1`；不要发送 `temperature`/`top_p`/`top_k`（保持调用选项最小化）。
 
@@ -146,6 +148,13 @@ bousai/
 - 机密（`OPENAI_API_KEY` 等）只用**环境变量**，本地放 `.env`（已 gitignore）。
 - **禁止**把任何密钥、`.env`、`node_modules/`、`target/` 提交到 git。
 - 后端须配置 **CORS** 放行前端来源（GitHub Pages 域名 + 本地 dev `http://localhost:5173`）。
+
+**日志**
+- 使用 Spring Boot 默认日志框架（SLF4J + Logback），配置入口为 `backend/src/main/resources/logback-spring.xml`；不要引入额外日志框架。
+- OpenAI 调用日志使用 logger `jp.kcgi.bousai.openai`，**任何环境都必须**输出到独立文件 `logs/openai-requests.log`；记录 request start/end/error，完整记录用户问题与模型返回内容，但不得记录 API key、Authorization header、完整密钥类配置。
+- 本地开发（默认 profile / `dev` / `local`）普通应用日志仅输出到控制台，不输出普通应用日志文件。
+- 生产部署（`prod` / `production` profile）普通应用日志输出到控制台与 `logs/bousai.log` 文件。
+- `logs/`、`backend/logs/` 属于运行产物，必须 gitignore，不提交。
 
 **Git**：分支 `main`（稳定）/ `feature/xxx`；提交信息用祈使句。
 

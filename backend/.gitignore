@@ -35,5 +35,5 @@ build/
 ### Bousai: ローカル DB / 機密 ###
 data/*.db
 data/*.db-journal
+logs/
 .env
-

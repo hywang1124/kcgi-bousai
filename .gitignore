@@ -14,6 +14,8 @@
 # （SQLite の出力先のみ。frontend/src/data 等のソースは対象外にするため anchored）
 /data/
 /backend/data/
+/logs/
+/backend/logs/
 *.db
 *.db-journal
 .env
