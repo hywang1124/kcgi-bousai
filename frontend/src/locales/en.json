@@ -32,51 +32,127 @@
   },
   "knowledge": {
     "heading": "Disaster Info",
-    "lead": "An introduction to the natural disasters common in Japan and how to prepare for them.",
-    "tipsTitle": "Key points to prepare and act",
+    "lead": "Based on official sources such as the Prime Minister’s Office, JMA and MLIT, this page summarizes preparation, evacuation decisions and disaster-specific actions.",
+    "tipsTitle": "Key points",
+    "actionsTitle": "Actions and checks",
+    "preparedness": {
+      "name": "Everyday preparation",
+      "summary": "Disasters can interrupt electricity, gas, water, communications and transport. Prepare at home and work so you can protect lives and live until help arrives.",
+      "tips": [
+        "Anchor furniture and keep tall items away from bedrooms and children’s rooms",
+        "Store at least three days of drinking water, ideally one week, using 3 liters per person per day as a guide",
+        "Keep your emergency bag light enough to carry while walking"
+      ],
+      "actions": [
+        "Keep a flashlight, slippers, whistle, glasses and regular medicine near where you sleep",
+        "Prepare portable toilets, batteries, a radio, medicine records, ID copies and a mobile battery",
+        "Agree on multiple family contact methods such as Disaster Message Dial 171 and message boards",
+        "Use hazard maps to check flood, landslide, tsunami and storm-surge risks around home, school and work"
+      ]
+    },
+    "evacuation": {
+      "name": "Evacuation decisions",
+      "summary": "Evacuation does not only mean going to a public shelter. Choose a place that protects life according to the disaster type, location and family situation.",
+      "tips": [
+        "At Alert Level 3, older people and others who need time should start evacuating",
+        "At Alert Level 4 evacuation order, everyone in a dangerous place should evacuate",
+        "Do not wait for Alert Level 5; act before dark and before wind or rain becomes severe"
+      ],
+      "actions": [
+        "Consider several destinations: designated emergency sites, safe relatives’ homes, hotels or upper floors",
+        "Sheltering indoors is only suitable when the building is safe and you can stay above expected flood depth",
+        "Avoid rivers, channels, coasts, underpasses, cliffs and slopes while evacuating",
+        "Check shelter openings, phone numbers and road closures only through municipal official sources"
+      ]
+    },
     "earthquake": {
       "name": "Earthquake",
-      "summary": "Earthquakes large and small happen often in Japan; strong shaking can collapse buildings and topple furniture.",
+      "summary": "When shaking starts or an earthquake early warning is issued, protect yourself first. Avoid injury before trying to handle fire sources.",
       "tips": [
-        "Protect yourself first: Drop, Cover, Hold On",
-        "After the shaking stops, turn off fire sources and secure an exit",
-        "Fix furniture in place and check evacuation routes with your family"
+        "Get low, protect your head and stay under a sturdy table until shaking stops",
+        "Do not rush outside; falling glass, walls and blocks can be dangerous",
+        "Do not force yourself to turn off fire sources during strong shaking"
+      ],
+      "actions": [
+        "After shaking stops, check for fire, gas smell, injuries, broken glass and exits",
+        "Open doors or windows to secure an evacuation route and wear shoes or slippers",
+        "Near the coast or river mouths, evacuate to high ground after strong or long shaking without waiting",
+        "In stations or commercial facilities, do not rush to exits; follow staff instructions and avoid elevators"
       ]
     },
     "tsunami": {
       "name": "Tsunami",
-      "summary": "If you feel strong or long shaking near the coast, a tsunami may be coming.",
+      "summary": "A tsunami is a powerful movement of the whole body of seawater. Later waves may be higher, so do not return until warnings are lifted.",
       "tips": [
-        "Evacuate immediately to high ground or a tsunami evacuation building",
-        "Stay away from the sea when a tsunami warning is issued",
-        "Go higher and farther — do not return until it is confirmed safe"
+        "If you feel strong or long shaking near the coast or a river mouth, move to high ground immediately",
+        "When a tsunami warning, advisory or evacuation order is issued, leave beaches, seawalls, river mouths and riversides",
+        "Do not go to watch or photograph the tsunami"
+      ],
+      "actions": [
+        "Check nearby high ground, tsunami towers, tsunami evacuation buildings and municipal evacuation sites in advance",
+        "Evacuate on foot in principle unless local plans specify vehicle evacuation",
+        "Do not return to coastal or flooded areas until tsunami warnings and advisories are lifted",
+        "Even after warnings are lifted, watch for damaged roads, debris, electric shock and fire, and follow official instructions"
+      ]
+    },
+    "heavyRain": {
+      "name": "Heavy rain, typhoon and flood",
+      "summary": "Heavy rain and typhoons can cause floods, inland flooding, landslides, strong winds, high waves, storm surges, outages and flooded underground spaces.",
+      "tips": [
+        "Check JMA warnings, Kikikuru risk maps, MLIT river information and municipal evacuation information",
+        "Use hazard maps to confirm flood zones, house-collapse flood zones and evacuation routes",
+        "Stay away from rivers, channels, coasts, flooded roads, underground malls and underpasses"
+      ],
+      "actions": [
+        "Before wind and rain worsen, check emergency supplies, shutters, drains and outdoor items",
+        "Households with older people, infants, disabled people, pregnant people or pets should evacuate early",
+        "If going outside is dangerous, move to a sturdy nearby building or an upper floor",
+        "Do not try to pass flooded roads on foot or by car"
+      ]
+    },
+    "landslide": {
+      "name": "Landslide",
+      "summary": "Slope failures, debris flows and landslides can occur after heavy rain or earthquakes, leaving very little time to escape.",
+      "tips": [
+        "Check whether your home, school route or workplace is in a landslide warning area",
+        "Monitor landslide warnings, rainfall, Kikikuru and municipal evacuation information",
+        "Do not wait for warning signs; evacuate early when alerts or orders are issued"
+      ],
+      "actions": [
+        "Watch for falling pebbles, water from slopes, ground cracks, rumbling sounds or muddy rivers",
+        "Avoid slopes, valleys, cliffs, bridges and flooded roads when evacuating",
+        "If outside evacuation is unsafe, move to the second floor or higher of a sturdy building away from the slope",
+        "Do not stay on the first floor of wooden houses or in rooms facing the mountain side"
       ]
     },
     "volcano": {
       "name": "Volcano",
-      "summary": "Japan has many active volcanoes; eruptions bring flying rocks, pyroclastic flows and ashfall.",
+      "summary": "Eruptions can bring volcanic rocks, pyroclastic flows, volcanic mudflows, lava, ash and gases. Large rocks and pyroclastic flows are especially dangerous.",
       "tips": [
-        "Follow eruption warning levels and access restrictions",
-        "Carry a helmet and mask when hiking volcanoes",
-        "During ashfall, protect your eyes, nose and mouth with goggles and a mask"
+        "Check volcanic hazard maps, eruption alert levels, access restrictions and municipal evacuation plans",
+        "Before hiking, check volcanic information and prepare a helmet, mask, light, water and food",
+        "If an eruption alert is issued, move away from the crater and protect your head in a sturdy building or behind rocks"
+      ],
+      "actions": [
+        "Cover your nose and mouth with a dust mask or wet cloth to avoid inhaling ash",
+        "If ash enters your eyes, rinse with water without rubbing and remove contact lenses",
+        "Avoid driving during ashfall because visibility and road grip worsen",
+        "When cleaning ash, use a mask, goggles and gloves, and follow municipal disposal instructions"
       ]
     },
-    "typhoon": {
-      "name": "Typhoon",
-      "summary": "Typhoons approach from summer to autumn, bringing violent winds, heavy rain and storm surges.",
+    "multilingual": {
+      "name": "Multilingual official information",
+      "summary": "People who are not confident in Japanese also need fast and accurate information. Use official multilingual and plain-Japanese sources, not guesses or unverified posts.",
       "tips": [
-        "Check the latest weather and evacuation information frequently",
-        "Put away outdoor items that could blow away",
-        "Stay away from rivers and the sea, and evacuate early while it is light"
-      ]
-    },
-    "flood": {
-      "name": "Flood",
-      "summary": "Heavy rain and typhoons can cause rivers to overflow and urban areas to flood.",
-      "tips": [
-        "Check your home's risk level on the hazard map in advance",
-        "Move to higher ground early (going to upper floors also helps)",
-        "Avoid underpasses, basements and swollen channels"
+        "JMA provides multilingual information on weather, earthquakes, tsunamis and volcanoes",
+        "The Cabinet Office introduces useful disaster apps and websites in multiple languages",
+        "Social media can be old or unverified, so prioritize municipal and public-agency information"
+      ],
+      "actions": [
+        "Before disasters, show foreign residents local shelters, hazard maps, apps and municipal social media",
+        "Use short, concrete messages that say who should do what, where and when",
+        "Use action-focused wording such as “If you are near the sea, move to high ground now”",
+        "Confirm shelter openings, phone numbers and current local conditions from official municipal sources"
       ]
     }
   },
