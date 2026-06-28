@@ -4,8 +4,8 @@ import jp.kcgi.bousai.ai.ChatAssistant;
 import jp.kcgi.bousai.ai.MockChatAssistant;
 import jp.kcgi.bousai.ai.RagCorpusLoader;
 import jp.kcgi.bousai.ai.SpringAiChatAssistant;
-import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.transformers.TransformersEmbeddingModel;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -18,10 +18,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 /**
- * {@link ChatAssistant} の実装切り替え（CLAUDE.md §6）。
+ * {@link ChatAssistant} の実装切り替え（OPENAI.md §6）。
  *
- * <p>環境変数 {@code ANTHROPIC_API_KEY}（= {@code spring.ai.anthropic.api-key}）が
- * 設定されている場合は Spring AI（Claude + RAG）実装、未設定の場合はモック実装を使う。
+ * <p>環境変数 {@code OPENAI_API_KEY}（= {@code spring.ai.openai.api-key}）が
+ * 設定されている場合は Spring AI（OpenAI + RAG）実装、未設定の場合はモック実装を使う。
  * RAG の語料（防災文書、{@code classpath:rag-corpus/}）は {@link RagCorpusLoader} が
  * 起動時にベクトルストアへ投入する。</p>
  */
@@ -38,17 +38,17 @@ public class AiAssistantConfig {
     private static final String MULTILINGUAL_TOKENIZER_URI =
             "https://huggingface.co/Xenova/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/tokenizer.json";
 
-    /** Anthropic API キーが設定されているかどうかの条件。 */
-    static class AnthropicApiKeyPresent implements Condition {
+    /** OpenAI API キーが設定されているかどうかの条件。 */
+    static class OpenAiApiKeyPresent implements Condition {
         @Override
         public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-            String key = context.getEnvironment().getProperty("spring.ai.anthropic.api-key", "");
+            String key = context.getEnvironment().getProperty("spring.ai.openai.api-key", "");
             return !key.isBlank();
         }
     }
 
     @Bean
-    @Conditional(AnthropicApiKeyPresent.class)
+    @Conditional(OpenAiApiKeyPresent.class)
     public EmbeddingModel embeddingModel() throws Exception {
         TransformersEmbeddingModel embeddingModel = new TransformersEmbeddingModel();
         embeddingModel.setModelResource(MULTILINGUAL_MODEL_URI);
@@ -58,19 +58,19 @@ public class AiAssistantConfig {
     }
 
     @Bean
-    @Conditional(AnthropicApiKeyPresent.class)
+    @Conditional(OpenAiApiKeyPresent.class)
     public VectorStore vectorStore(EmbeddingModel embeddingModel) {
         return SimpleVectorStore.builder(embeddingModel).build();
     }
 
     @Bean
-    @Conditional(AnthropicApiKeyPresent.class)
-    public ChatAssistant springAiChatAssistant(AnthropicChatModel chatModel, VectorStore vectorStore) {
+    @Conditional(OpenAiApiKeyPresent.class)
+    public ChatAssistant springAiChatAssistant(OpenAiChatModel chatModel, VectorStore vectorStore) {
         return new SpringAiChatAssistant(chatModel, vectorStore);
     }
 
     @Bean
-    @Conditional(AnthropicApiKeyPresent.class)
+    @Conditional(OpenAiApiKeyPresent.class)
     public RagCorpusLoader ragCorpusLoader(VectorStore vectorStore) {
         return new RagCorpusLoader(vectorStore);
     }

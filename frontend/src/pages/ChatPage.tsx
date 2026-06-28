@@ -10,7 +10,7 @@ interface ChatMessage {
   error?: boolean
 }
 
-/** 防災 AI 問答ページ。Claude 風のチャット UI で、回答はストリーミングで逐次表示する。 */
+/** 防災 AI 問答ページ。OpenAI 対応のチャット UI で、回答はストリーミングで逐次表示する。 */
 export function ChatPage() {
   const { t, i18n } = useTranslation()
   const [question, setQuestion] = useState('')

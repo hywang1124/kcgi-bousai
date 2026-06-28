@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * {@link RagCorpusLoader} が実際に公式サイトの語料を埋め込み、関連する文書を
- * 検索できることを確認するテスト（Claude API キーは不要、ベクトル検索のみ検証）。
+ * 検索できることを確認するテスト（OpenAI API キーは不要、ベクトル検索のみ検証）。
  */
 class RagCorpusLoaderTest {
 
@@ -65,16 +65,34 @@ class RagCorpusLoaderTest {
     }
 
     @Test
-    void retrievesTokyoDocumentForEvacuationQuestion() {
+    void retrievesEvacuationDocumentForEvacuationQuestion() {
         List<Document> results = vectorStore.similaritySearch(SearchRequest.builder()
-                .query("東京都の地震対策や避難情報について教えて")
+                .query("避難指示が出たらどこへ避難すればいい？")
                 .topK(2)
                 .similarityThreshold(0.5)
                 .build());
 
         assertFalse(results.isEmpty(), "should retrieve at least one document above threshold");
-        boolean foundTokyoDoc = results.stream()
-                .anyMatch(doc -> doc.getText().contains("東京都"));
-        assertTrue(foundTokyoDoc, "expected Tokyo metropolitan document among top results");
+        boolean foundEvacuationDoc = results.stream()
+                .anyMatch(doc -> doc.getText().contains("警戒レベル4")
+                        || doc.getText().contains("避難指示")
+                        || doc.getText().contains("指定緊急避難場所"));
+        assertTrue(foundEvacuationDoc, "expected evacuation guidance among top results");
+    }
+
+    @Test
+    void retrievesEarthquakeActionDocumentForImmediateActionQuestion() {
+        List<Document> results = vectorStore.similaritySearch(SearchRequest.builder()
+                .query("地震が来たらどうすればいい？")
+                .topK(4)
+                .similarityThreshold(0.5)
+                .build());
+
+        assertFalse(results.isEmpty(), "should retrieve earthquake action guidance above threshold");
+        boolean foundEarthquakeActionDoc = results.stream()
+                .anyMatch(doc -> doc.getText().contains("まず身の安全")
+                        || doc.getText().contains("丈夫な机")
+                        || doc.getText().contains("頭を保護"));
+        assertTrue(foundEarthquakeActionDoc, "expected earthquake immediate-action guidance among top results");
     }
 }

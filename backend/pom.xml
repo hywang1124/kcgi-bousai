@@ -47,17 +47,17 @@
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 
-		<!-- Spring AI: Claude(Anthropic) ChatClient -->
+		<!-- Spring AI: OpenAI ChatClient -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-starter-model-anthropic</artifactId>
+			<artifactId>spring-ai-starter-model-openai</artifactId>
 		</dependency>
 		<!-- Spring AI: RAG（RetrievalAugmentationAdvisor）。語料未投入でも雛形として配線する -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-rag</artifactId>
 		</dependency>
-		<!-- ベクトルストア（dev: SimpleVectorStore＝ファイル/メモリ。CLAUDE.md §6） -->
+		<!-- ベクトルストア（dev: SimpleVectorStore＝ファイル/メモリ。OPENAI.md §6） -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-vector-store</artifactId>

@@ -1,6 +1,6 @@
-# CLAUDE.md — 防災マップ Web System
+# OPENAI.md — 防災マップ Web System
 
-> 本文件是 Claude Code 的项目记忆文件，每次会话启动时自动加载。
+> 本文件是 OpenAI / Codex 的项目记忆文件，每次会话启动时自动加载。
 > 维护原则：**简洁、准确、及时更新**。过时的架构描述比没有更糟。建议保持在 200 行以内。
 
 ---
@@ -23,7 +23,7 @@
 | Web | spring-boot-starter-webmvc | REST API |
 | 校验 | spring-boot-starter-validation | DTO 校验 |
 | 监控 | spring-boot-starter-actuator | 健康检查 |
-| **AI** | **Spring AI 2.0.x**（`spring-ai-starter-model-anthropic`） | 防灾 AI 问答（RAG）；LLM 为 **Claude**（`claude-opus-4-8`）。`ANTHROPIC_API_KEY` 未设置时自动回退到 Mock 实现 |
+| **AI** | **Spring AI 2.0.x**（`spring-ai-starter-model-openai`） | 防灾 AI 问答（RAG）；LLM 为 **OpenAI**（`gpt-4.1`）。`OPENAI_API_KEY` 未设置时自动回退到 Mock 实现 |
 | 前端 | **React + TypeScript + Vite** | SPA，部署到 GitHub Pages |
 | 地图 | **MapLibre GL JS** + OpenStreetMap | 展示避难所静态点位 |
 | i18n | react-i18next | 多语言（ja / en / zh / zh-TW） |
@@ -60,7 +60,7 @@
 └───────────────┬─────────────────────────────────────────┘
                 │
 ┌───────────────▼─────────────────────────────────────────┐
-│ 外部：Claude API (Anthropic)                              │
+│ 外部：OpenAI API                                        │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -70,7 +70,7 @@
 
 ## 4. 核心特性（Features）
 
-1. **AI 防灾问答（核心后端功能，Spring AI + Claude + RAG）**：自然语言提问，检索本地防灾文档生成回答，**按用户语言回答**并附来源；支持非流式（`/api/v1/chat`）与流式 SSE（`/api/v1/chat/stream`）。`ANTHROPIC_API_KEY` 未设置时回退 Mock 实现（无 key 也可跑通链路），详见 §6。RAG 向量库目前**未导入语料**（基础设施已就位）。
+1. **AI 防灾问答（核心后端功能，Spring AI + OpenAI + RAG）**：自然语言提问，检索本地防灾文档生成回答，**按用户语言回答**并附来源；支持非流式（`/api/v1/chat`）与流式 SSE（`/api/v1/chat/stream`）。`OPENAI_API_KEY` 未设置时回退 Mock 实现（无 key 也可跑通链路），详见 §6。RAG 向量库目前**未导入语料**（基础设施已就位）。
 2. **避难所地图（纯前端静态数据）**：数据源为**国土地理院「指定緊急避難場所データ」（京都市）**，编译进前端；MapLibre 展示点位，支持按最近距离排序与地理定位。
 3. **防灾知识（纯前端静态）**：地震 / 海啸 / 火山 / 台风 / 洪水 的介绍与备灾要点。
 4. **多语言**：ja / en / zh / zh-TW，UI 与内容全部 i18n。
@@ -88,17 +88,17 @@
 
 ## 6. AI 模块规范（Spring AI）
 
-- 业务只依赖自定义 **`ChatAssistant` 接口**（`generate` 非流式 / `generateStream` 流式 `Flux<String>`）。两个实现由 `AiAssistantConfig` 按 `ANTHROPIC_API_KEY` 是否设置二选一注入，**不改 Controller/Service**：
-  - **`SpringAiChatAssistant`**：Spring AI `ChatClient` + Claude（`claude-opus-4-8`）+ `RetrievalAugmentationAdvisor`（RAG）。
+- 业务只依赖自定义 **`ChatAssistant` 接口**（`generate` 非流式 / `generateStream` 流式 `Flux<String>`）。两个实现由 `AiAssistantConfig` 按 `OPENAI_API_KEY` 是否设置二选一注入，**不改 Controller/Service**：
+  - **`SpringAiChatAssistant`**：Spring AI `ChatClient` + OpenAI（`gpt-4.1`）+ `RetrievalAugmentationAdvisor`（RAG）。
   - **`MockChatAssistant`**：无 key 时的回退，模拟流式输出，保证链路始终可跑通。
 - **RAG**：`VectorStoreDocumentRetriever` + `SimpleVectorStore`（文件持久化 `backend/data/vector-store.json`，gitignore 对象）。语料来自内閣府防災情報・首相官邸防災ページ・国土交通省「川の防災情報」・気象庁多言語ページ・東京都防災ホームページ等官方网站，存于 `backend/src/main/resources/rag-corpus/*.md`（各文件首行注明出典 URL），由 `RagCorpusLoader` 在启动时切分・向量化并写入持久化文件（已存在则直接加载，不重新嵌入）。
 - **嵌入模型**：`TransformersEmbeddingModel`（本地 ONNX，无需 API key），使用多语言模型 `Xenova/paraphrase-multilingual-MiniLM-L12-v2`（在 `AiAssistantConfig` 中指定 `modelResource`/`tokenizerResource`）。**不要改回默认的 `all-MiniLM-L6-v2`**——该模型对日语语义相似度过低（实测 0.25–0.46），会导致 `SpringAiChatAssistant` 中配置的 `similarityThreshold(0.5)` 永远检索不到任何文档。
-- **`ContextualQueryAugmenter` 必须设置 `allowEmptyContext(true)`**（`SpringAiChatAssistant.buildRagAdvisor`）。Spring AI 默认行为是：检索不到资料（相似度低于阈值）时，**直接丢弃用户原始问题**，替换成英文固定文案「The user query is outside your knowledge base...」发给 LLM——这会让安全红线（下面的「資料にありません」逻辑）完全失效，且用户问题本身永远不会到达 Claude。已通过 `SpringAiChatAssistantRagTest` 验证修复后两种情形：命中资料时正确注入上下文；未命中时原始问题原样传递。
+- **`ContextualQueryAugmenter` 必须设置 `allowEmptyContext(true)`**（`SpringAiChatAssistant.buildRagAdvisor`）。Spring AI 默认行为是：检索不到资料（相似度低于阈值）时，**直接丢弃用户原始问题**，替换成英文固定文案「The user query is outside your knowledge base...」发给 LLM——这会让安全红线（下面的「資料にありません」逻辑）完全失效，且用户问题本身永远不会到达 OpenAI 模型。已通过 `SpringAiChatAssistantRagTest` 验证修复后两种情形：命中资料时正确注入上下文；未命中时原始问题原样传递。
 - **流式**：`POST /api/v1/chat/stream` 返回 `text/event-stream`（Spring MVC 对 `Flux<String>` 自动按 `data:<chunk>\n\n` 分帧）。前端用 `fetch` + `ReadableStream` 解析。
 - **系统 prompt 红线**：仅基于检索到的防灾资料回答；信息不足时明确说「資料にありません」并引导联系当地自治体，**禁止编造避难所位置、电话、灾害指引**（安全关键）。
 - **多语言**：接收用户语言参数，用对应语言作答。
-- API key（`ANTHROPIC_API_KEY`）等机密只走环境变量（见 §8），**绝不**写入代码或提交到 git。
-- **模型选择**：除非用户明确要求，新增/调整 LLM 调用一律使用 `claude-opus-4-8`；不要发送 `temperature`/`top_p`/`top_k`（该模型会拒绝）。
+- API key（`OPENAI_API_KEY`）等机密只走环境变量（见 §8），**绝不**写入代码或提交到 git。
+- **模型选择**：除非用户明确要求，新增/调整 LLM 调用一律使用 `gpt-4.1`；不要发送 `temperature`/`top_p`/`top_k`（保持调用选项最小化）。
 
 ---
 
@@ -112,7 +112,7 @@ bousai/
 │   │   ├── service/              # ChatService
 │   │   ├── dto/                  # ChatRequest / ChatResponse
 │   │   ├── ai/                   # ChatAssistant + SpringAiChatAssistant + MockChatAssistant
-│   │   ├── config/               # CORS、AiAssistantConfig（Claude/Mock 切替・RAG 配線）
+│   │   ├── config/               # CORS、AiAssistantConfig（OpenAI/Mock 切替・RAG 配線）
 │   │   └── BousaiApplication.java
 │   ├── src/main/resources/application.properties
 │   └── pom.xml
@@ -120,7 +120,7 @@ bousai/
 │   ├── src/{components,pages,api,i18n,locales,data,lib}/
 │   ├── .github/workflows/deploy.yml
 │   └── package.json
-└── CLAUDE.md
+└── OPENAI.md
 ```
 
 ---
@@ -143,7 +143,7 @@ bousai/
 - 调后端：dev 用 Vite proxy（`/api`）；prod 用环境变量 `VITE_API_BASE_URL` 指向后端公网地址（见 §9）。
 
 **安全 / 机密 / CORS**
-- 机密（`ANTHROPIC_API_KEY` 等）只用**环境变量**，本地放 `.env`（已 gitignore）。
+- 机密（`OPENAI_API_KEY` 等）只用**环境变量**，本地放 `.env`（已 gitignore）。
 - **禁止**把任何密钥、`.env`、`node_modules/`、`target/` 提交到 git。
 - 后端须配置 **CORS** 放行前端来源（GitHub Pages 域名 + 本地 dev `http://localhost:5173`）。
 

@@ -4,6 +4,19 @@ import type { ChatAnswer } from './types'
 // VITE_API_BASE_URL で後端の公開 URL を指定する。
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? ''
 
+function parseSseDataFrame(frame: string): string | null {
+  const dataLines = frame
+    .replace(/\r\n/g, '\n')
+    .split('\n')
+    .filter((line) => line.startsWith('data:'))
+    .map((line) => line.slice('data:'.length))
+
+  if (dataLines.length === 0) {
+    return null
+  }
+  return dataLines.join('\n')
+}
+
 /**
  * 防災 AI に質問する（非ストリーミング）。
  */
@@ -51,8 +64,9 @@ export async function streamChat(
     while ((sepIndex = buffer.indexOf('\n\n')) !== -1) {
       const frame = buffer.slice(0, sepIndex)
       buffer = buffer.slice(sepIndex + 2)
-      if (frame.startsWith('data:')) {
-        onDelta(frame.slice('data:'.length))
+      const data = parseSseDataFrame(frame)
+      if (data !== null) {
+        onDelta(data)
       }
     }
   }
