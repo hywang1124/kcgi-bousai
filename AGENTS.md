@@ -24,7 +24,7 @@
 | 校验 | spring-boot-starter-validation | DTO 校验 |
 | 监控 | spring-boot-starter-actuator | 健康检查 |
 | 日志 | Spring Boot 默认 Logback + SLF4J | 本地控制台 / 生产文件 / OpenAI 专用文件 |
-| **AI** | **Spring AI 2.0.x**（`spring-ai-starter-model-openai`） | 防灾 AI 问答（RAG）；LLM 为 **OpenAI**（`gpt-4.1`）。`OPENAI_API_KEY` 未设置时自动回退到 Mock 实现 |
+| **AI** | **Spring AI 2.0.x**（`spring-ai-starter-model-openai`） | 通用防灾 AI 问答；LLM 为 **OpenAI**（`gpt-4.1`）。`OPENAI_API_KEY` 未设置时自动回退到 Mock 实现 |
 | 前端 | **React + TypeScript + Vite** | SPA，部署到 GitHub Pages |
 | 地图 | **MapLibre GL JS** + OpenStreetMap | 展示避难所静态点位 |
 | i18n | react-i18next | 多语言（ja / en / zh / zh-TW） |
@@ -56,8 +56,7 @@
 │  后端 Spring Boot（仅 AI 聊天）                           │
 │  ┌─ Controller 层 (ChatController, DTO 校验)             │
 │  ├─ Service 层    (ChatService)                          │
-│  └─ AI 模块       (ChatAssistant: ChatClient + RAG)      │
-│       └─ SimpleVectorStore (文件, 无需数据库)             │
+│  └─ AI 模块       (ChatAssistant: ChatClient)            │
 └───────────────┬─────────────────────────────────────────┘
                 │
 ┌───────────────▼─────────────────────────────────────────┐
@@ -71,7 +70,7 @@
 
 ## 4. 核心特性（Features）
 
-1. **AI 防灾问答（核心后端功能，Spring AI + OpenAI + RAG）**：自然语言提问，检索本地防灾文档生成回答，**按用户语言回答**并附来源；支持非流式（`/api/v1/chat`）与流式 SSE（`/api/v1/chat/stream`）。`OPENAI_API_KEY` 未设置时回退 Mock 实现（无 key 也可跑通链路），详见 §6。RAG 向量库目前**未导入语料**（基础设施已就位）。
+1. **AI 防灾问答（核心后端功能，Spring AI + OpenAI）**：自然语言提问，回答通用防灾知识，**按用户语言回答**；支持非流式（`/api/v1/chat`）与流式 SSE（`/api/v1/chat/stream`）。`OPENAI_API_KEY` 未设置时回退 Mock 实现（无 key 也可跑通链路），详见 §6。
 2. **避难所地图（纯前端静态数据）**：数据源为**国土地理院「指定緊急避難場所データ」（京都市）**，编译进前端；MapLibre 展示点位，支持按最近距离排序与地理定位。
 3. **防灾知识（纯前端静态）**：地震 / 海啸 / 火山 / 台风 / 洪水 的介绍与备灾要点。
 4. **多语言**：ja / en / zh / zh-TW，UI 与内容全部 i18n。
@@ -83,20 +82,17 @@
 - **本系统不使用数据库**
 - AI 聊天**不落库**（不保存聊天记录）；如将来确需持久化再单独评估。
 - 避难所、防灾知识等内容是**前端静态数据**（`frontend/src/data/`、locales），随构建打包。
-- RAG 向量库用 Spring AI 的 **`SimpleVectorStore`（文件持久化，无需数据库服务）**。
+- AI 聊天不需要任何持久化组件。
 
 ---
 
 ## 6. AI 模块规范（Spring AI）
 
 - 业务只依赖自定义 **`ChatAssistant` 接口**（`generate` 非流式 / `generateStream` 流式 `Flux<String>`）。两个实现由 `AiAssistantConfig` 按 `OPENAI_API_KEY` 是否设置二选一注入，**不改 Controller/Service**：
-  - **`SpringAiChatAssistant`**：Spring AI `ChatClient` + OpenAI（`gpt-4.1`）+ `RetrievalAugmentationAdvisor`（RAG）。
+  - **`SpringAiChatAssistant`**：Spring AI `ChatClient` + OpenAI（`gpt-4.1`）。
   - **`MockChatAssistant`**：无 key 时的回退，模拟流式输出，保证链路始终可跑通。
-- **RAG**：`VectorStoreDocumentRetriever` + `SimpleVectorStore`（文件持久化 `backend/data/vector-store.json`，gitignore 对象）。语料来自内閣府防災情報・首相官邸防災ページ・国土交通省「川の防災情報」・気象庁多言語ページ・東京都防災ホームページ等官方网站，存于 `backend/src/main/resources/rag-corpus/*.md`（各文件首行注明出典 URL），由 `RagCorpusLoader` 在启动时切分・向量化并写入持久化文件（已存在则直接加载，不重新嵌入）。
-- **嵌入模型**：`TransformersEmbeddingModel`（本地 ONNX，无需 API key），使用多语言模型 `Xenova/paraphrase-multilingual-MiniLM-L12-v2`（在 `AiAssistantConfig` 中指定 `modelResource`/`tokenizerResource`）。**不要改回默认的 `all-MiniLM-L6-v2`**——该模型对日语语义相似度过低（实测 0.25–0.46），会导致 `SpringAiChatAssistant` 中配置的 `similarityThreshold(0.5)` 永远检索不到任何文档。
-- **`ContextualQueryAugmenter` 必须设置 `allowEmptyContext(true)`**（`SpringAiChatAssistant.buildRagAdvisor`）。Spring AI 默认行为是：检索不到资料（相似度低于阈值）时，**直接丢弃用户原始问题**，替换成英文固定文案「The user query is outside your knowledge base...」发给 LLM——这会让安全红线（下面的「資料にありません」逻辑）完全失效，且用户问题本身永远不会到达 Codex。已通过 `SpringAiChatAssistantRagTest` 验证修复后两种情形：命中资料时正确注入上下文；未命中时原始问题原样传递。
 - **流式**：`POST /api/v1/chat/stream` 返回 `text/event-stream`（Spring MVC 对 `Flux<String>` 自动按 `data:<chunk>\n\n` 分帧）。前端用 `fetch` + `ReadableStream` 解析。
-- **系统 prompt 红线**：仅基于检索到的防灾资料回答；信息不足时明确说「資料にありません」并引导联系当地自治体，**禁止编造避难所位置、电话、灾害指引**（安全关键）。
+- **系统 prompt 红线**：只回答通用防灾知识；最新信息、地域別情報、避難所位置/电话/开放状态、当前警报、避难路线等一律说明「このシステムでは確認できません」，并引导查看自治体・気象庁・国土地理院等官方最新信息。**禁止编造避难所位置、电话、灾害指引**（安全关键）。
 - **多语言**：接收用户语言参数，用对应语言作答。
 - **OpenAI 调用日志**：`SpringAiChatAssistant` 使用专用 logger `jp.kcgi.bousai.openai` 记录 OpenAI request start/end/error；日志内容不得包含 API key、Authorization header。请求问题与返回内容需完整记录（仅转义换行/引号，避免破坏单行日志格式）。
 - API key（`OPENAI_API_KEY`）等机密只走环境变量（见 §8），**绝不**写入代码或提交到 git。
@@ -114,7 +110,7 @@ bousai/
 │   │   ├── service/              # ChatService
 │   │   ├── dto/                  # ChatRequest / ChatResponse
 │   │   ├── ai/                   # ChatAssistant + SpringAiChatAssistant + MockChatAssistant
-│   │   ├── config/               # CORS、AiAssistantConfig（OpenAI/Mock 切替・RAG 配線）
+│   │   ├── config/               # CORS、AiAssistantConfig（OpenAI/Mock 切替）
 │   │   └── BousaiApplication.java
 │   ├── src/main/resources/application.properties
 │   └── pom.xml

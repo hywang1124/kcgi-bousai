@@ -5,10 +5,8 @@ import reactor.core.publisher.Flux;
 /**
  * 防災 AI 問答のポート（抽象）。
  *
- * <p>API キー未設定時は {@link MockChatAssistant}、設定時は Spring AI の
- * {@code ChatClient} + RAG（{@code RetrievalAugmentationAdvisor}）を用いた
- * 実装に切り替わる（{@code AiAssistantConfig} 参照）。呼び出し側はこのインタフェース
- * にのみ依存する。</p>
+ * <p>API キー未設定時は {@link MockChatAssistant}、設定時は Spring AI の {@code ChatClient} を用いた
+ * 実装に切り替える（{@code AiAssistantConfig} 参照）。呼び出し側はこのインターフェースにのみ依存する。</p>
  */
 public interface ChatAssistant {
 

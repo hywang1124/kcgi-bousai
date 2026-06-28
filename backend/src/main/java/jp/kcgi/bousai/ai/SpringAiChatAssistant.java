@@ -3,32 +3,17 @@ package jp.kcgi.bousai.ai;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
-import org.springframework.ai.rag.generation.augmentation.ContextualQueryAugmenter;
-import org.springframework.ai.rag.generation.augmentation.QueryAugmenter;
-import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
-import org.springframework.ai.vectorstore.VectorStore;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.UUID;
 
 /**
- * Spring AI（{@code ChatClient}）+ OpenAI + RAG による {@link ChatAssistant} 実装。
+ * Spring AI（{@code ChatClient}）+ OpenAI による {@link ChatAssistant} 実装。
  *
- * <p>RAG は {@code RetrievalAugmentationAdvisor} + {@code VectorStoreDocumentRetriever} +
- * {@code VectorStore} で構成し、{@code classpath:rag-corpus/} の防災資料（{@code RagCorpusLoader}
- * が起動時に投入）を検索して回答に注入する。</p>
- *
- * <p><b>{@code allowEmptyContext(true)} が必須</b>：既定の {@code ContextualQueryAugmenter}
- * は類似度がしきい値に満たず資料が見つからない場合、ユーザーの質問文そのものを破棄して
- * 「The user query is outside your knowledge base.」という英語の固定文に置き換えてしまう
- * （Spring AI の既定挙動）。これでは元の質問が LLM に届かず、安全要件（OPENAI.md §6 / §11）
- * で求める「資料にありません」という案内（質問内容に応じた多言語応答）も機能しない。
- * {@code allowEmptyContext(true)} にすることで資料が無い場合は質問文をそのまま渡し、
- * system prompt の指示（資料が無ければ「資料にありません」と明示する）に委ねる。</p>
+ * <p>RAG は使わず、一般的な防災知識に範囲を限定して回答する。避難所の位置・電話番号・開設状況、
+ * 現在の警報、地域別の最新指示などは、自治体や気象庁などの公式情報の確認を案内する。</p>
  */
 public class SpringAiChatAssistant implements ChatAssistant {
 
@@ -36,46 +21,30 @@ public class SpringAiChatAssistant implements ChatAssistant {
 
     private static final String SYSTEM_TEMPLATE = """
             あなたは防災情報アシスタントです。次の方針を厳守してください。
-            - 提供された資料（コンテキスト）に基づいてのみ回答する。
-            - 資料に該当情報が無い場合は「資料にありません」と明示し、お住まいの自治体の
-              公式情報を確認するよう案内する。
-            - 避難所の位置・電話番号・災害指示を絶対に創作しない（安全上重要）。
-            - 必ず利用者の言語（言語コード: %s）で回答する。
+            - 地震、津波、台風、大雨、洪水、土砂災害、火山、備蓄、避難行動などの一般的な防災知識だけを回答する。
+            - 避難所の位置・電話番号・開設状況、避難ルート、現在の警報、現在の災害状況、地域別の最新指示は回答しない。
+            - 最新情報や地域別情報を聞かれた場合は、このシステムでは確認できないことを明示し、自治体・気象庁・国土地理院などの公式最新情報を確認するよう案内する。
+            - 分からない内容や根拠が不確かな内容は推測せず、「このシステムでは確認できません」と明示する。
+            - 避難所情報、電話番号、災害指示を絶対に創作しない（安全上重要）。
+            - 必ず利用者の言語（言語コード: %s）で、子どもや外国人にも分かりやすい表現で回答する。
             """;
 
     private final ChatClient chatClient;
 
-    public SpringAiChatAssistant(OpenAiChatModel chatModel, VectorStore vectorStore) {
-        this.chatClient = ChatClient.builder(chatModel)
-                .defaultAdvisors(buildRagAdvisor(vectorStore))
-                .build();
-    }
-
-    /**
-     * RAG Advisor を構築する（テストから直接呼べるよう package-private に分離）。
-     */
-    static Advisor buildRagAdvisor(VectorStore vectorStore) {
-        QueryAugmenter queryAugmenter = ContextualQueryAugmenter.builder()
-                .allowEmptyContext(true)
-                .build();
-        return RetrievalAugmentationAdvisor.builder()
-                .documentRetriever(VectorStoreDocumentRetriever.builder()
-                        .vectorStore(vectorStore)
-                        .similarityThreshold(0.5)
-                        .topK(4)
-                        .build())
-                .queryAugmenter(queryAugmenter)
-                .build();
+    public SpringAiChatAssistant(OpenAiChatModel chatModel) {
+        this.chatClient = ChatClient.builder(chatModel).build();
     }
 
     @Override
     public ChatAnswer generate(String question, String lang) {
         String requestId = UUID.randomUUID().toString();
         long startedAt = System.currentTimeMillis();
+        String systemPrompt = SYSTEM_TEMPLATE.formatted(lang);
         logOpenAiRequestStart(requestId, "chat", question, lang);
+        logOpenAiPrompt(requestId, "chat", lang, systemPrompt, question);
         try {
             String text = chatClient.prompt()
-                    .system(SYSTEM_TEMPLATE.formatted(lang))
+                    .system(systemPrompt)
                     .user(question)
                     .call()
                     .content();
@@ -91,10 +60,12 @@ public class SpringAiChatAssistant implements ChatAssistant {
     public Flux<String> generateStream(String question, String lang) {
         String requestId = UUID.randomUUID().toString();
         long startedAt = System.currentTimeMillis();
+        String systemPrompt = SYSTEM_TEMPLATE.formatted(lang);
         StringBuilder answer = new StringBuilder();
         logOpenAiRequestStart(requestId, "stream", question, lang);
+        logOpenAiPrompt(requestId, "stream", lang, systemPrompt, question);
         return chatClient.prompt()
-                .system(SYSTEM_TEMPLATE.formatted(lang))
+                .system(systemPrompt)
                 .user(question)
                 .stream()
                 .content()
@@ -111,6 +82,24 @@ public class SpringAiChatAssistant implements ChatAssistant {
                 lang,
                 question.length(),
                 escapeLogValue(question));
+    }
+
+    private static void logOpenAiPrompt(String requestId, String mode, String lang, String systemPrompt, String question) {
+        logOpenAiPromptMessage(requestId, mode, lang, 0, "system", systemPrompt);
+        logOpenAiPromptMessage(requestId, mode, lang, 1, "user", question);
+    }
+
+    private static void logOpenAiPromptMessage(
+            String requestId, String mode, String lang, int index, String role, String content) {
+        openAiRequestLog.info(
+                "openai_prompt requestId={} mode={} lang={} index={} role={} contentLength={} content=\"{}\"",
+                requestId,
+                mode,
+                lang,
+                index,
+                role,
+                content.length(),
+                escapeLogValue(content));
     }
 
     private static void logOpenAiRequestEnd(String requestId, String mode, long startedAt, String answer) {
