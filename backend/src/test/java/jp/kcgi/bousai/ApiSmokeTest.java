@@ -14,8 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * AI 聊天 API のスモークテスト。実ポートを立てて HTTP で疎通を確認する。
- * リクエストボディは UTF-8 で送るため、日本語の質問でも文字化けしない。
+ * AI チャット API のスモークテスト。実ポートを立てて HTTP 疎通を確認する。
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ApiSmokeTest {
@@ -31,7 +30,7 @@ class ApiSmokeTest {
 
     @Test
     void chatEndpointReturnsAnswer() throws Exception {
-        String body = "{\"question\":\"地震が来たらどうすればいい？\",\"lang\":\"ja\"}";
+        String body = "{\"question\":\"地震が来たらどうすればいいですか？\",\"lang\":\"ja\"}";
         HttpResponse<String> res = http.send(
                 HttpRequest.newBuilder(URI.create(url("/api/v1/chat")))
                         .header("Content-Type", "application/json")
@@ -45,8 +44,22 @@ class ApiSmokeTest {
     }
 
     @Test
+    void chatEndpointUsesQuestionLanguageOverUiLanguage() throws Exception {
+        String body = "{\"question\":\"请介绍一下地震\",\"lang\":\"zh\"}";
+        HttpResponse<String> res = http.send(
+                HttpRequest.newBuilder(URI.create(url("/api/v1/chat")))
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
+                        .build(),
+                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+
+        assertEquals(200, res.statusCode());
+        assertTrue(res.body().contains("\"lang\":\"zh\""), "answer language should follow the question");
+    }
+
+    @Test
     void chatStreamEndpointReturnsSseChunks() throws Exception {
-        String body = "{\"question\":\"地震が来たらどうすればいい？\",\"lang\":\"ja\"}";
+        String body = "{\"question\":\"地震が来たらどうすればいいですか？\",\"lang\":\"ja\"}";
         HttpResponse<String> res = http.send(
                 HttpRequest.newBuilder(URI.create(url("/api/v1/chat/stream")))
                         .header("Content-Type", "application/json")

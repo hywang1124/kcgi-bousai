@@ -24,7 +24,7 @@
 | 校验 | spring-boot-starter-validation | DTO 校验 |
 | 监控 | spring-boot-starter-actuator | 健康检查 |
 | 日志 | Spring Boot 默认 Logback + SLF4J | 本地控制台 / 生产文件 / OpenAI 专用文件 |
-| **AI** | **Spring AI 2.0.x**（`spring-ai-starter-model-openai`） | 通用防灾 AI 问答；LLM 为 **OpenAI**（`gpt-4.1`）。`OPENAI_API_KEY` 未设置时自动回退到 Mock 实现 |
+| **AI** | **Spring AI 2.0.x**（`spring-ai-starter-model-openai`）+ Lingua | 通用防灾 AI 问答；调用模型前识别问题语言；LLM 为 **OpenAI**（`gpt-4.1`）。`OPENAI_API_KEY` 未设置时自动回退到 Mock 实现 |
 | 前端 | **React + TypeScript + Vite** | SPA，部署到 GitHub Pages |
 | 地图 | **MapLibre GL JS** + OpenStreetMap | 展示避难所静态点位 |
 | i18n | react-i18next | 多语言（ja / en / zh / zh-TW） |
@@ -93,7 +93,7 @@
   - **`MockChatAssistant`**：无 key 时的回退，模拟流式输出，保证链路始终可跑通。
 - **流式**：`POST /api/v1/chat/stream` 返回 `text/event-stream`（Spring MVC 对 `Flux<String>` 自动按 `data:<chunk>\n\n` 分帧）。前端用 `fetch` + `ReadableStream` 解析。
 - **系统 prompt 红线**：只回答通用防灾知识；最新信息、地域別情報、避難所位置/电话/开放状态、当前警报、避难路线等一律说明「このシステムでは確認できません」，并引导查看自治体・気象庁・国土地理院等官方最新信息。**禁止编造避难所位置、电话、灾害指引**（安全关键）。
-- **多语言**：接收用户语言参数，用对应语言作答。
+- **多语言**：后端用 Lingua 在调用模型前识别问题语言（ja / en / zh），优先按问题语言回答；无法可靠识别时才回退到前端传入的 `lang`。
 - **OpenAI 调用日志**：`SpringAiChatAssistant` 使用专用 logger `jp.kcgi.bousai.openai` 记录 OpenAI request start/end/error；日志内容不得包含 API key、Authorization header。请求问题与返回内容需完整记录（仅转义换行/引号，避免破坏单行日志格式）。
 - API key（`OPENAI_API_KEY`）等机密只走环境变量（见 §8），**绝不**写入代码或提交到 git。
 - **模型选择**：除非用户明确要求，新增/调整 LLM 调用一律使用 `gpt-4.1`；不要发送 `temperature`/`top_p`/`top_k`（保持调用选项最小化）。
